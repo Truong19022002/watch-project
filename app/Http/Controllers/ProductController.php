@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 use App\Models\Product;
+use App\Models\ProductDetail;
+use Carbon\Carbon;
+
 
 class ProductController extends Controller
 {
@@ -43,14 +47,21 @@ class ProductController extends Controller
         ]);
 
         $product = new Product();
+        $product->maSanPham = substr(uniqid(), 0, 8);
         $product->tenSanPham = $request->input('tenSanPham');
         $product->giaSanPham = $request->input('giaSanPham');
         $product->maLoai = $request->input('maLoai');
         $product->maThuongHieu = $request->input('maThuongHieu');
+        $product->slTonKho = null;
+        $product->anhSP = null;
+        $product->moTaSP = null;
+        $product->ngayThemSP = Carbon::now();
+        $product->maSeri = substr(uniqid(), 0, 12);
         $product->save();
 
         $productDetail = new ProductDetail();
         $productDetail->maSanPham = $product->maSanPham;
+        $productDetail->maChiTietSP = substr(uniqid(), 0, 8);
         $productDetail->maKichThuoc = $request->input('maKichThuoc');
         $productDetail->maHinhDang = $request->input('maHinhDang');
         $productDetail->maChatlieu = $request->input('maChatlieu');
@@ -91,6 +102,21 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $productDetail = DB::table('tchitietsp')->where('maSanPham', $id)->first();
+            if ($productDetail) {
+                DB::table('tchitietsp')->where('maSanPham', $id)->delete();
+            }
+
+            $product = DB::table('tsanpham')->where('maSanPham', $id)->first();
+            if (!$product) {
+                throw new ModelNotFoundException('Product not found');
+            }
+            DB::table('tsanpham')->where('maSanPham', $id)->delete();
+
+            return response()->json(['message' => 'Product deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
