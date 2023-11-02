@@ -16,9 +16,10 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $result = DB::table('view_product')->paginate(10);
+        $pageSize = $request->input('pageSize', 10);
+        $result = DB::table('view_product')->paginate($pageSize);
         return $result;
     }
 
