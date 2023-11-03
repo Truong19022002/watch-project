@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImageSP;
+use Faker\Provider\Image;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +47,8 @@ class ProductController extends Controller
             'maHinhDang' => 'required',
             'maChatlieu' => 'required',
             'maDayDeo' => 'required',
-            'maCCHD' => 'required'
+            'maCCHD' => 'required',
+            'maAnhCTSP' => 'required',
         ]);
 
         $product = new Product();
@@ -55,7 +58,7 @@ class ProductController extends Controller
         $product->maLoai = $request->input('maLoai');
         $product->maThuongHieu = $request->input('maThuongHieu');
         $product->slTonKho = null;
-        $product->anhSP = null;
+        $product->anhSP=$request -> file('anhSP')->store('tsanpham');
         $product->moTaSP = null;
         $product->ngayThemSP = Carbon::now();
         $product->maSeri = substr(uniqid(), 0, 12);
@@ -70,10 +73,10 @@ class ProductController extends Controller
         $productDetail->maDayDeo = $request->input('maDayDeo');
         $productDetail->maCCHD = $request->input('maCCHD');
         $productDetail->save();
-
+        
         return response()->json(['message' => 'Product created successfully', 'data' => $product]);
     }
-
+   
     /**
      * Display the specified resource.
      */
@@ -121,4 +124,32 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    function search($key) {
+        return Product::where('tenSanPham', 'like', "%$key%")
+            ->orWhereHas('brand', function ($query) use ($key) {
+                $query->where('tenThuongHieu', 'like', "%$key%");
+            })
+            ->orWhereHas('type', function ($query) use ($key) {
+                $query->where('tenLoai', 'like',"%$key%");
+            })
+            ->orWhereHas('productDetail.material', function ($query) use ($key) {
+                $query->where('tenCL', 'like', "%$key%");
+            })
+            ->orWhereHas('productDetail.size', function ($query) use ($key) {
+                $query->where('kichThuoc', 'like', "%$key%");
+            })
+            ->orWhereHas('productDetail.cchd', function ($query) use ($key) {
+                $query->where('tenCCHD', 'like', "%$key%");
+            })
+            ->orWhereHas('productDetail.watchShape', function ($query) use ($key) {
+                $query->where('tenHinhDang', 'like', "%$key%");
+            })
+            ->orWhereHas('productDetail.watchStrap', function ($query) use ($key) {
+                $query->where('loaiDayDeo', 'like', "%$key%");
+            })
+            ->get();
+    }
+    
+    
+       
 }

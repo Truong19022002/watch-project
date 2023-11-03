@@ -21,3 +21,7 @@ use Illuminate\Support\Facades\Route;
 //      return $request->user();
 //      });
 Route::apiResource('product', ProductController::class);
+Route::post('/register',[UserController::class,'register']);
+Route::post('/login',[UserController::class,'login']);
+Route::get('search/{key}',[ProductController::class,'search']);
+Route::post('/media-file',[ProductController::class,'uploadImages']);

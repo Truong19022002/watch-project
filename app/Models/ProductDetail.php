@@ -22,12 +22,15 @@ class ProductDetail extends Model
         return $this->belongsTo(CCHD::class, 'maCCHD', 'maCCHD');
     }
     public function watchStrap() : BelongsTo {
-        return $this->belongsTo(WatchShape::class, 'maDayDeo', 'maDayDeo');
+        return $this->belongsTo(WatchStrap::class, 'maDayDeo', 'maDayDeo');
     }
     public function material() : BelongsTo {
-        return $this->belongsTo(Material::class, 'maCL', 'maCL');
+        return $this->belongsTo(Material::class, 'maChatlieu', 'maCL');
     }
     public function watchShape() : BelongsTo {
         return $this->belongsTo(WatchShape::class, 'maHinhDang', 'maHinhDang');
+    }
+    public function imagectsp() : BelongsTo {
+        return $this->belongsTo(ImageSP::class, 'maChiTietSP', 'maChiTietSP');
     }
 }
