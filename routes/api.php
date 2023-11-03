@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -21,5 +22,8 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::apiResource('product', ProductController::class);
 
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+Route::middleware(['api'])->prefix('/auth')->group(function() {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/profile', [AuthController::class, 'me']);
+});
