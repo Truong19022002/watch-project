@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+//      return $request->user();
+//      });
 Route::apiResource('product', ProductController::class);
 
 Route::middleware(['api'])->prefix('/auth')->group(function() {
@@ -27,3 +27,6 @@ Route::middleware(['api'])->prefix('/auth')->group(function() {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/profile', [AuthController::class, 'me']);
 });
+
+Route::get('search/{key}',[ProductController::class,'search']);
+Route::post('/media-file',[ProductController::class,'uploadImages']);

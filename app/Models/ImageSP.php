@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Material extends Model
+
+class ImageSP extends Model
 {
-    protected $table = 'tchatlieu';
+    protected $table = 'tanhctsp';
     public $timestamps = false;
     public function productDetail() : HasMany {
-        return $this->hasMany(ProductDetail::class, 'maCL', 'maChatlieu');
+        return $this->hasMany(ProductDetail::class, 'maChiTietSP', 'maChiTietSP');
     }
 }
-
