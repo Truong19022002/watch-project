@@ -21,7 +21,12 @@ use Illuminate\Support\Facades\Route;
 //      return $request->user();
 //      });
 Route::apiResource('product', ProductController::class);
-Route::post('/register',[UserController::class,'register']);
-Route::post('/login',[UserController::class,'login']);
+
+Route::middleware(['api'])->prefix('/auth')->group(function() {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/profile', [AuthController::class, 'me']);
+});
+
 Route::get('search/{key}',[ProductController::class,'search']);
 Route::post('/media-file',[ProductController::class,'uploadImages']);
