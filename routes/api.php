@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
@@ -42,11 +43,18 @@ Route::apiResource('cart', CartController::class);
 
 Route::get('/momo_payment', [CheckoutController::class, 'momo_payment']);
 
-Route::middleware(['api'])->prefix('/auth')->group(function() {
+Route::middleware(['user'])->prefix('/auth/admin')->group(function() {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/profile', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+Route::middleware(['client'])->prefix('/auth/user')->group(function() {
+    Route::post('/login', [ClientController::class, 'login']);
+    Route::post('/register', [ClientController::class, 'register']);
+    Route::get('/profile', [ClientController::class, 'me']);
+    Route::post('/logout', [ClientController::class, 'logout']);
 });
 
 // Route::get('search/{key}',[ProductController::class,'search']);

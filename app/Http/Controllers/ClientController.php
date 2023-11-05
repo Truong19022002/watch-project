@@ -1,8 +1,7 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Client;
 use Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -10,58 +9,59 @@ use JWTAuth;
 
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class ClientController extends Controller
 {
-    //
+    // 
     public function __construct()
     {
-        $this->middleware('auth:user', ['except' => ['login', 'register', 'me']]);//login, register methods won't go through the api guard
+        $this->middleware('auth:client', ['except' => ['login', 'register', 'me']]);//login, register methods won't go through the api guard
     }
 
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required',
+            'email' => 'required',
             'password' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $credentials = $request->only('username', 'password');
+        $credentials = $request->only('email', 'password');
 
-        if (! $token = auth('user')->attempt($credentials)) {
+        if (! $token = auth('client')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
     }
 
-
     public function register(Request $request)
     {
-        $user = new User;
-        $user->idUser = rand(1000000, 99999999);
-        $user->username = $request->input('username');
-        $user->firstName = $request->input('firstName');
-        $user->lastName = $request->input('lastName');
-        $user->email = $request->input('email');
-        $user->contact = $request->input('contact');
-        $user->maChucVu = $request->input('maChucVu');
-        $user->password = Hash::make($request->input('password'));
+        $client = new Client;
+        $client->maKhachHang = rand(1000000, 99999999);
+        $client->tenKhachHang = $request->input('tenKhachHang');
+        // $client->username = $request->input('username');
+        $client->gioiTinh = $request->input('gioiTinh');
+        $client->diaChi = $request->input('diaChi');
+        $client->SDT = $request->input('SDT');
+        $client->email = $request->input('email');
+        $client->password = Hash::make($request->input('password'));
 
-        $user->save();
+        $client->save();
         // $newUser = User::where('idUser', $user->idUser)->first();
-        $token = JWTAuth::fromUser($user);
+        $token = JWTAuth::fromUser($client);
 
         return response()->json([
             'message' => 'User successfully registered',
+            'token'=> $token,
+            'user' => $client
         ], 200);
     }
 
     public function me()
     {
-        return response()->json(auth('user')->user());
+        return response()->json(auth('client')->user());
     }
 
     public function logout()
@@ -80,7 +80,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60, //mention the guard name inside the auth fn
-            'user' => auth('user')->user()
+            'user' => auth('client')->user()
         ]);
     }
 }
