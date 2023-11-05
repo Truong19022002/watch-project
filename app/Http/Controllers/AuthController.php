@@ -24,7 +24,6 @@ class AuthController extends Controller
             'username' => 'required',
             'password' => 'required',
         ]);
-
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
@@ -42,7 +41,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $user = new User;
-        $user->idUser = substr(uniqid(), 0, 8);
+        $user->idUser = rand(1000000, 99999999);
         $user->username = $request->input('username');
         $user->firstName = $request->input('firstName');
         $user->lastName = $request->input('lastName');
@@ -59,8 +58,6 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User successfully registered',
-            'user' => $user,
-            'token' => $token,
         ], 200);
     }
 
