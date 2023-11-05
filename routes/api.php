@@ -49,5 +49,7 @@ Route::middleware(['api'])->prefix('/auth')->group(function() {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::get('search/{key}',[ProductController::class,'search']);
+// Route::get('search/{key}',[ProductController::class,'search']);
+Route::get('search',[ProductController::class, 'search']);
+
 Route::post('/media-file',[ProductController::class,'uploadImages']);

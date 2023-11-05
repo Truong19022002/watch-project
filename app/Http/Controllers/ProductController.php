@@ -76,7 +76,7 @@ class ProductController extends Controller
         
         return response()->json(['message' => 'Product created successfully', 'data' => $product]);
     }
-   
+
     /**
      * Display the specified resource.
      */
@@ -129,7 +129,6 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-<<<<<<< HEAD
 
     public function getListId(Request $request) {
         try {
@@ -164,34 +163,43 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete products', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-=======
-    function search($key) {
-        return Product::where('tenSanPham', 'like', "%$key%")
-            ->orWhereHas('brand', function ($query) use ($key) {
-                $query->where('tenThuongHieu', 'like', "%$key%");
-            })
-            ->orWhereHas('type', function ($query) use ($key) {
-                $query->where('tenLoai', 'like',"%$key%");
-            })
-            ->orWhereHas('productDetail.material', function ($query) use ($key) {
-                $query->where('tenCL', 'like', "%$key%");
-            })
-            ->orWhereHas('productDetail.size', function ($query) use ($key) {
-                $query->where('kichThuoc', 'like', "%$key%");
-            })
-            ->orWhereHas('productDetail.cchd', function ($query) use ($key) {
-                $query->where('tenCCHD', 'like', "%$key%");
-            })
-            ->orWhereHas('productDetail.watchShape', function ($query) use ($key) {
-                $query->where('tenHinhDang', 'like', "%$key%");
-            })
-            ->orWhereHas('productDetail.watchStrap', function ($query) use ($key) {
-                $query->where('loaiDayDeo', 'like', "%$key%");
-            })
-            ->get();
+
+    // function search($key) {
+    //     return Product::where('tenSanPham', 'like', "%$key%")
+    //         ->orWhereHas('brand', function ($query) use ($key) {
+    //             $query->where('tenThuongHieu', 'like', "%$key%");
+    //         })
+    //         ->orWhereHas('type', function ($query) use ($key) {
+    //             $query->where('tenLoai', 'like',"%$key%");
+    //         })
+    //         ->orWhereHas('productDetail.material', function ($query) use ($key) {
+    //             $query->where('tenCL', 'like', "%$key%");
+    //         })
+    //         ->orWhereHas('productDetail.size', function ($query) use ($key) {
+    //             $query->where('kichThuoc', 'like', "%$key%");
+    //         })
+    //         ->orWhereHas('productDetail.cchd', function ($query) use ($key) {
+    //             $query->where('tenCCHD', 'like', "%$key%");
+    //         })
+    //         ->orWhereHas('productDetail.watchShape', function ($query) use ($key) {
+    //             $query->where('tenHinhDang', 'like', "%$key%");
+    //         })
+    //         ->orWhereHas('productDetail.watchStrap', function ($query) use ($key) {
+    //             $query->where('loaiDayDeo', 'like', "%$key%");
+    //         })
+    //         ->get();
+    // }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->get('keyword');
+        $pageSize = $request->get('pageSize', 10);
+
+        $query = DB::table('view_product')->where('tenSanPham', 'like', '%'.$keyword.'%');
+
+        $items = $query->paginate($pageSize);
+        $items->appends(['keyword' => $keyword]);
+
+        return response()->json($items);
     }
-    
-    
-       
->>>>>>> 1fa8f9d2b956e3cdb0185617cc7563acb21c47d3
 }
