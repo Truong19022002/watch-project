@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Client;
 use Auth;
 use Illuminate\Support\Facades\Validator;
@@ -39,7 +40,7 @@ class ClientController extends Controller
     public function register(Request $request)
     {
         $client = new Client;
-        $client->maKhachHang = rand(1000000, 99999999);
+        $client->maKhachHang = rand(10000000, 99999999);
         $client->tenKhachHang = $request->input('tenKhachHang');
         // $client->username = $request->input('username');
         $client->gioiTinh = $request->input('gioiTinh');
@@ -48,14 +49,21 @@ class ClientController extends Controller
         $client->email = $request->input('email');
         $client->password = Hash::make($request->input('password'));
 
+        
+        $cart = new Cart;
+        $cart->maGioHang = $client->maKhachHang;
+        $cart->maKhachHang = $client->maKhachHang;
         $client->save();
-        // $newUser = User::where('idUser', $user->idUser)->first();
+        $cart->save();
+
+
         $token = JWTAuth::fromUser($client);
 
         return response()->json([
             'message' => 'User successfully registered',
             'token'=> $token,
-            'user' => $client
+            'user' => $client,
+            'cart' => $cart
         ], 200);
     }
 
