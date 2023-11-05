@@ -48,7 +48,7 @@ class ProductController extends Controller
             'maChatlieu' => 'required',
             'maDayDeo' => 'required',
             'maCCHD' => 'required',
-            'maAnhCTSP' => 'required',
+            // 'maAnhCTSP' => 'required',
         ]);
 
         $product = new Product();
@@ -58,7 +58,9 @@ class ProductController extends Controller
         $product->maLoai = $request->input('maLoai');
         $product->maThuongHieu = $request->input('maThuongHieu');
         $product->slTonKho = null;
-        $product->anhSP=$request -> file('anhSP')->store('tsanpham');
+        $product->anhSP = null;
+        // $product->anhSP=$request -> file('anhSP')->store('tsanpham');
+
         $product->moTaSP = null;
         $product->ngayThemSP = Carbon::now();
         $product->maSeri = substr(uniqid(), 0, 12);
@@ -130,33 +132,40 @@ class ProductController extends Controller
         }
     }
 
-    public function getListId(Request $request) {
-        try {
-            $ids = $request->input('ids');
-            
-            $foundProducts = DB::table('view_product')->whereIn('maSanPham', $ids)->get();
-            
-            $notFoundIds = array_diff($ids, $foundProducts->pluck('maSanPham')->all());
-    
-            return response()->json([
-                'foundProducts' => $foundProducts,
-                'notFoundIds' => $notFoundIds
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to retrieve product list', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    public function getListId(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        $foundIds = [];
+        $notFoundIds = [];
+
+        foreach ($ids as $id) {
+            $product = DB::table('tsanpham')->where('maSanPham', $id)->first();
+
+            if ($product) {
+                $foundIds[] = $id;
+            } else {
+                $notFoundIds[] = $id;
+            }
         }
+
+        return [
+            'foundIds' => $foundIds,
+            'notFoundIds' => $notFoundIds
+        ];
     }
 
-    public function deleteMany()
+    public function deleteMany(Request $request)
     {
         try {
-            $result = $this->getListId(['ids' => $ids])->getData();
-            $foundProducts = $result->foundProducts;
-            $notFoundIds = $result->notFoundIds;
+            $ids = $request->input('ids');
 
-            foreach ($foundProducts as $product) {
-                DB::table('tsanpham')->where('maSanPham', $product->maSanPham)->delete();
-            }
+            $listId = $this->getListId($request);
+            $foundIds = $listId['foundIds'];
+            $notFoundIds = $listId['notFoundIds'];
+
+            DB::table('tchitietsp')->whereIn('maSanPham', $foundIds)->delete();
+            DB::table('tsanpham')->whereIn('maSanPham', $foundIds)->delete();
 
             return response()->json(['message' => 'Products deleted successfully', 'notFoundIds' => $notFoundIds]);
         } catch (\Exception $e) {
