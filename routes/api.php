@@ -12,6 +12,7 @@ use App\Http\Controllers\CCHDController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\RevenueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -64,3 +65,5 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
 Route::get('search',[ProductController::class, 'search']);
 
 Route::post('/media-file',[ProductController::class,'uploadImages']);
+
+Route::get('revenue', [RevenueController::class,'index']);
