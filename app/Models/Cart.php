@@ -12,6 +12,7 @@ class Cart extends Model
 {
     // use HasFactory;
     protected $table = 'tgiohang';
+    protected $primaryKey = 'maGioHang';
     public $timestamps = false;
 
     public function cartDetail() : HasMany {
