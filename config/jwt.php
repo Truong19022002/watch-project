@@ -10,7 +10,7 @@
  */
 
 return [
-    'identifier' => 'idUser', 
+    'identifier' => 'maKhachHang', 
     /*
     |--------------------------------------------------------------------------
     | JWT Authentication Secret
