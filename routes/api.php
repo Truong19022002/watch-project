@@ -31,14 +31,17 @@ use Illuminate\Support\Facades\Route;
 //      return $request->user();
 //      });
 Route::apiResource('product', ProductController::class);
+
 Route::get('/product-ids', [ProductController::class, 'getListId']);
 Route::delete('/product-ids', [ProductController::class, 'deleteMany']);
+
 Route::get('/brand', [BrandController::class, 'get']);
 Route::get('/size', [SizeController::class, 'get']);
 Route::get('/strap', [WatchStrapController::class, 'get']);
 Route::get('/shape', [WatchShapeController::class, 'get']);
 Route::get('/cchd', [CCHDController::class, 'get']);
 Route::get('/material', [MaterialController::class, 'get']);
+Route::get('/type', [MaterialController::class, 'get']);
 
 Route::apiResource('cart', CartController::class);
 

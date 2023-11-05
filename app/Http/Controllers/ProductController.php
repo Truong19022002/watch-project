@@ -85,12 +85,11 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = DB::table('view_product')->where('maSanPham', $id)->first();
-        $addToCartUrl = route('cart.store');
+        $addToCartUrl = route('cart.store', ['maSanPham' => $product->maSanPham]);
         return response()->json([
             'product' => $product,
             'addToCartUrl' => $addToCartUrl
         ]);
-        // return $result;
     }
 
     /**
