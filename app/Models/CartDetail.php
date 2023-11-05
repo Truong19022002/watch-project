@@ -10,6 +10,12 @@ class CartDetail extends Model
     // use HasFactory;
     protected $table = 'tchitietgh';
     public $timestamps = false;
+    protected $fillable = [
+        'maChiTietGH', 
+        'maGioHang', 
+        'maSanPham', 
+        'ngayThemSP'
+    ];
 
     public function cart() : BelongsTo {
         return $this->belongsTo(Cart::class, 'maGioHang', 'maGioHang');
