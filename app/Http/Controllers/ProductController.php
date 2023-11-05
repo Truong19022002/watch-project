@@ -78,8 +78,13 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $result = DB::table('view_product')->where('maSanPham', $id)->first();
-        return $result;
+        $product = DB::table('view_product')->where('maSanPham', $id)->first();
+        $addToCartUrl = route('cart.store');
+        return response()->json([
+            'product' => $product,
+            'addToCartUrl' => $addToCartUrl
+        ]);
+        // return $result;
     }
 
     /**
@@ -118,6 +123,40 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product deleted successfully']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getListId(Request $request) {
+        try {
+            $ids = $request->input('ids');
+            
+            $foundProducts = DB::table('view_product')->whereIn('maSanPham', $ids)->get();
+            
+            $notFoundIds = array_diff($ids, $foundProducts->pluck('maSanPham')->all());
+    
+            return response()->json([
+                'foundProducts' => $foundProducts,
+                'notFoundIds' => $notFoundIds
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to retrieve product list', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function deleteMany()
+    {
+        try {
+            $result = $this->getListId(['ids' => $ids])->getData();
+            $foundProducts = $result->foundProducts;
+            $notFoundIds = $result->notFoundIds;
+
+            foreach ($foundProducts as $product) {
+                DB::table('tsanpham')->where('maSanPham', $product->maSanPham)->delete();
+            }
+
+            return response()->json(['message' => 'Products deleted successfully', 'notFoundIds' => $notFoundIds]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete products', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
