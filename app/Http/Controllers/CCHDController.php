@@ -10,7 +10,7 @@ class CCHDController extends Controller
 {
     public function get(Request $request)
     {
-        $result = DB::table('tkichthuoc')->get();
+        $result = DB::table('tcchd')->get();
 
         return response()->json($result, 200);
     }

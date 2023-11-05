@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\User;
@@ -30,9 +32,31 @@ class CartController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Product $productId)
+    public function store(Request $request)
     {
-        return response()->json($request);
+        $productId = $request->input('maSanPham');
+
+        $product = DB::table('view_product')->where('maSanPham', $productId)->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
+
+        $cartCode = $cart->maGioHang;
+
+        $cartDetailCode = 'CD' . Carbon::now()->timestamp;
+
+        $cartDetail = CartDetail::create([
+            'maChiTietGH' => $cartDetailCode,
+            'maGioHang' => $cartCode,
+            'maSanPham' => $product->maSanPham,
+            'ngayThemSP' => Carbon::now()
+        ]);
+
+        return response()->json(['message' => 'Product added to cart', 'cart_detail' => $cartDetail]);
+        // return response()->json(['message' => $request]);
     }
 
     /**

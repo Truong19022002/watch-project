@@ -10,7 +10,7 @@ class WatchShapeController extends Controller
 {
     public function get(Request $request)
     {
-        $result = DB::table('tkichthuoc')->get();
+        $result = DB::table('thinhdang')->get();
 
         return response()->json($result, 200);
     }

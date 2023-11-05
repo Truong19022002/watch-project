@@ -9,7 +9,7 @@ class MaterialController extends Controller
 {
     public function get(Request $request)
     {
-        $result = DB::table('tkichthuoc')->get();
+        $result = DB::table('tchatlieu')->get();
 
         return response()->json($result, 200);
     }
