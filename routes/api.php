@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
@@ -25,8 +26,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+//      return $request->user();
+//      });
 Route::apiResource('product', ProductController::class);
 Route::get('/product-ids', [ProductController::class, 'getListId']);
 Route::delete('/product-ids', [ProductController::class, 'deleteMany']);
@@ -41,5 +42,12 @@ Route::apiResource('cart', CartController::class);
 
 Route::get('/momo_payment', [CheckoutController::class, 'momo_payment']);
 
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+Route::middleware(['api'])->prefix('/auth')->group(function() {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/profile', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+Route::get('search/{key}',[ProductController::class,'search']);
+Route::post('/media-file',[ProductController::class,'uploadImages']);
