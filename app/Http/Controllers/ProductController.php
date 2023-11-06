@@ -61,7 +61,7 @@ class ProductController extends Controller
         $product->anhSP = null;
         // $product->anhSP=$request -> file('anhSP')->store('tsanpham');
 
-        $product->moTaSP = null;
+        $product->moTaSP = $request->input('moTaSP');
         $product->ngayThemSP = Carbon::now();
         $product->maSeri = substr(uniqid(), 0, 12);
         $product->save();
