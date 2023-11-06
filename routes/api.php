@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\WatchStrapController;
@@ -40,7 +41,7 @@ Route::get('/strap', [WatchStrapController::class, 'get']);
 Route::get('/shape', [WatchShapeController::class, 'get']);
 Route::get('/cchd', [CCHDController::class, 'get']);
 Route::get('/material', [MaterialController::class, 'get']);
-Route::get('/type', [MaterialController::class, 'get']);
+Route::get('/type', [TypeController::class, 'get']);
 
 Route::apiResource('cart', CartController::class);
 
