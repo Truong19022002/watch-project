@@ -55,8 +55,10 @@ class CartController extends Controller
             'ngayThemSP' => Carbon::now()
         ]);
 
+        $cart->tongTienGH = $this->calculateTotalPrice($cart);
+        $cart->save();
+
         return response()->json(['message' => 'Product added to cart', 'cart_detail' => $cartDetail]);
-        // return response()->json(['message' => $request]);
     }
 
     /**
@@ -88,6 +90,31 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $cartDetail = DB::table('tchitietgh')->where('maChiTietGH', $id)->first();
+
+            if (!$cartDetail) {
+                return response()->json(['message' => 'Cart detail not found'], 404);
+            }
+
+            DB::table('tchitietgh')->where('maChiTietGH', $id)->delete();
+
+            return response()->json(['message' => 'Cart detail deleted'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public static function calculateTotalPrice($cart)
+    {
+        $cartDetails = $cart->cartDetail;
+        $totalPrice = 0;
+
+        foreach ($cartDetails as $cartDetail) {
+            $product = $cartDetail->product;
+            $totalPrice += $product->giaSanPham;
+        }
+
+        return $totalPrice;
     }
 }
