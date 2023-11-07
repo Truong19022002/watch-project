@@ -210,4 +210,54 @@ class ProductController extends Controller
 
         return response()->json($items);
     }
+    public function getImage($maSanPham)
+    {
+        $product = Product::where('maSanPham', $maSanPham)->firstOrFail();
+
+        
+        return response()->json(["img_product/{$product->anhSP}"]);
+        
+    }
+    
+
+    public function filter(Request $request)
+    {
+        $filters = $request->only(['maChatLieu', 'maKichThuoc', 'maHinhDang', 'maCCHD', 'maDayDeo']);
+        $query = Product::query()
+            ->join('tchitietsp', 'tsanpham.maSanPham', '=', 'tchitietsp.maSanPham')
+            ->join('tcchd', 'tchitietsp.maCCHD', '=', 'tcchd.maCCHD')
+            ->join('tchatlieu', 'tchitietsp.maChatLieu', '=', 'tchatlieu.maCL')
+            ->join('tdaydeo', 'tchitietsp.maDayDeo', '=', 'tdaydeo.maDayDeo')
+            ->join('thinhdang', 'tchitietsp.maHinhDang', '=', 'thinhdang.maHinhDang')
+            ->join('tkichthuoc', 'tchitietsp.maKichThuoc', '=', 'tkichthuoc.maKichThuoc')
+            ->join('tloai', 'tsanpham.maLoai', '=', 'tloai.maLoai')
+            ->join('tthuonghieu', 'tsanpham.maThuongHieu', '=', 'tthuonghieu.maThuongHieu');
+
+        $query->where(function ($query) use ($filters) {
+            foreach ($filters as $field => $value) {
+                if (!empty($value)) {
+                    // Kiểm tra nếu $field là một mảng giá trị
+                    if (is_array($value)) {
+                        $query->whereIn('tchitietsp.' . $field, $value);
+                    } else {
+                        $query->where('tchitietsp.' . $field, $value);
+                    }
+                }
+            }
+        });
+
+        if (!empty($filters['maThuongHieu'])) {
+            $query->where('tthuonghieu.maThuongHieu', $filters['maThuongHieu']);
+        }
+
+        // Thêm điều kiện lọc theo mã loại
+        if (!empty($filters['maLoai'])) {
+            $query->where('tloai.maLoai', $filters['maLoai']);
+        }
+
+        $products = $query->get(['tsanpham.*', 'tloai.*', 'tthuonghieu.*']);
+
+        return response()->json(['products' => $products]);
+    }
+
 }

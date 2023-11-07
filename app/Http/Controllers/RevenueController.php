@@ -22,19 +22,52 @@ class RevenueController extends Controller
 
     //     return response()->json(['revenue' => $revenue]);
     // }
-    public function index(Request $request)
+    // public function index(Request $request)
+    // {
+    //     $month = $request->query('month');
+    //     $year = $request->query('year');
+
+    //     $revenue = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+    //         ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+    //         ->whereMonth('thdb.ngayLapHD', $month)
+    //         ->whereYear('thdb.ngayLapHD', $year)
+    //         ->select(DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as revenue'))
+    //         ->first()
+    //         ->revenue;
+
+    //     return response()->json(['revenue' => $revenue]);
+    // }
+
+    public function revenue()
     {
-        $month = $request->query('month');
-        $year = $request->query('year');
+        $revenues = [];
 
-        $revenue = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-            ->whereMonth('thdb.ngayLapHD', $month)
-            ->whereYear('thdb.ngayLapHD', $year)
-            ->select(DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as revenue'))
-            ->first()
-            ->revenue;
+        $years = DB::table('thdb')
+            ->select(DB::raw('YEAR(ngayLapHD) as year'))
+            ->distinct()
+            ->get();
 
-        return response()->json(['revenue' => $revenue]);
+        foreach ($years as $year) {
+            $monthlyRevenues = [];
+
+            for ($month = 1; $month <= 12; $month++) {
+                $revenue = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+                    ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+                    ->whereMonth('thdb.ngayLapHD', $month)
+                    ->whereYear('thdb.ngayLapHD', $year->year)
+                    ->select(DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as revenue'))
+                    ->first()
+                    ->revenue;
+
+                $monthlyRevenues[] = [
+                    'month' => $month,
+                    'revenue' => $revenue,
+                ];
+            }
+
+            $revenues[$year->year] = $monthlyRevenues;
+        }
+
+        return response()->json(['revenues' => $revenues]);
     }
 }
