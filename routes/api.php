@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\WatchStrapController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\CCHDController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\RevenueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +43,7 @@ Route::get('/strap', [WatchStrapController::class, 'get']);
 Route::get('/shape', [WatchShapeController::class, 'get']);
 Route::get('/cchd', [CCHDController::class, 'get']);
 Route::get('/material', [MaterialController::class, 'get']);
-Route::get('/type', [MaterialController::class, 'get']);
+Route::get('/type', [TypeController::class, 'get']);
 
 Route::apiResource('cart', CartController::class);
 
@@ -69,3 +71,10 @@ Route::post('/media-file',[ProductController::class,'uploadImages']);
 Route::get('/monthlyRevenues', [RevenueController::class,'Month']);
 Route::get('/quarterlyRevenues', [RevenueController::class,'Quarter']);
 Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
+Route::get('revenue', [RevenueController::class,'revenue']);
+
+Route::get('products/{maSanPham}/image', [ProductController::class,'getImage']);
+
+Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
+
+Route::get('products', [ProductController::class,'filter']);
