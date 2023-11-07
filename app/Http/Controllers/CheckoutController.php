@@ -32,7 +32,7 @@ class CheckoutController extends Controller
         $accessKey = 'klm05TvNBzhg7h7j';
         $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
         $orderInfo = "Thanh toán qua MoMo";
-        $amount = "10000";
+        $amount = 10000;
         $orderId = time() ."";
         $redirectUrl = "http://127.0.0.1:8000/";
         $ipnUrl = "http://127.0.0.1:8000/";
@@ -59,12 +59,11 @@ class CheckoutController extends Controller
             'requestType' => $requestType,
             'signature' => $signature);
         $result = $this->execPostRequest($endpoint, json_encode($data));
-        dd($result);
+        // dd($result);
         $jsonResult = json_decode($result, true);  // decode json
 
         //Just a example, please check more in there
 
         return redirect()->to($jsonResult['payUrl']);
-        // header('Location: ' . $jsonResult['payUrl']);
     }
 }
