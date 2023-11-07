@@ -172,44 +172,66 @@ class ProductController extends Controller
         }
     }
 
-    // function search($key) {
-    //     return Product::where('tenSanPham', 'like', "%$key%")
-    //         ->orWhereHas('brand', function ($query) use ($key) {
-    //             $query->where('tenThuongHieu', 'like', "%$key%");
-    //         })
-    //         ->orWhereHas('type', function ($query) use ($key) {
-    //             $query->where('tenLoai', 'like',"%$key%");
-    //         })
-    //         ->orWhereHas('productDetail.material', function ($query) use ($key) {
-    //             $query->where('tenCL', 'like', "%$key%");
-    //         })
-    //         ->orWhereHas('productDetail.size', function ($query) use ($key) {
-    //             $query->where('kichThuoc', 'like', "%$key%");
-    //         })
-    //         ->orWhereHas('productDetail.cchd', function ($query) use ($key) {
-    //             $query->where('tenCCHD', 'like', "%$key%");
-    //         })
-    //         ->orWhereHas('productDetail.watchShape', function ($query) use ($key) {
-    //             $query->where('tenHinhDang', 'like', "%$key%");
-    //         })
-    //         ->orWhereHas('productDetail.watchStrap', function ($query) use ($key) {
-    //             $query->where('loaiDayDeo', 'like', "%$key%");
-    //         })
-    //         ->get();
-    // }
+
 
     public function search(Request $request)
-    {
-        $keyword = $request->get('keyword');
-        $pageSize = $request->get('pageSize', 10);
+{
+    $keyword = $request->get('keyword');
+    $pageSize = $request->get('pageSize', 10);
+    $minPrice = $request->get('minPrice');
+    $maxPrice = $request->get('maxPrice');
+    $orderBy = $request->get('orderBy');
+    $gioiTinh = $request->get('gioiTinh');
+    $chatLieu = $request->get('chatLieu');
+    $hinhDang = $request->get('hinhDang');
+    $CCDH = $request->get('CCDH');
+    $dayDeo = $request ->get('dayDeo');
+    $kichThuoc = $request->get('kichThuoc');
+    $query = DB::table('view_product')->where('tenSanPham', 'like', '%'.$keyword.'%');
 
-        $query = DB::table('view_product')->where('tenSanPham', 'like', '%'.$keyword.'%');
-
-        $items = $query->paginate($pageSize);
-        $items->appends(['keyword' => $keyword]);
-
-        return response()->json($items);
+    if (!empty($minPrice)) {
+        $query->where('giaSanPham', '>=', $minPrice);
     }
+
+    if (!empty($maxPrice)) {
+        $query->where('giaSanPham', '<=', $maxPrice);
+    }
+    if (!empty($gioiTinh)) {
+        $query->where('tenLoai', 'LIKE', '%'.$gioiTinh.'%');
+    }
+    if (!empty($chatLieu)) {
+        $query->where('tenCL', 'LIKE', '%'.$chatLieu.'%');
+    }
+    if (!empty($hinhDang)) {
+        $query->where('tenHinhDang', 'LIKE', '%'.$hinhDang.'%');
+    }
+    if (!empty($CCDH)) {
+        $query->where('tenCCDH', 'LIKE', '%'.$CCDH.'%');
+    }
+    if (!empty($dayDeo)) {
+        $query->where('loaiDayDeo', 'LIKE', '%'.$dayDeo.'%');
+    }
+    if (!empty($kichThuoc)) {
+        $query->where('kichThuoc', 'LIKE', '%'.$kichThuoc.'%');
+    }
+    $query->orderBy('giaSanPham', $orderBy);
+
+    $items = $query->paginate($pageSize);
+    $items->appends([
+        'keyword' => $keyword,
+        'minPrice' => $minPrice,
+        'maxPrice' => $maxPrice,
+        'orderBy' => $orderBy,
+        'gioiTinh' => $gioiTinh,
+        'chatLieu'=> $chatLieu,
+        'hinhDang' => $hinhDang,
+        'CCDH' => $CCDH,
+        'dayDeo'=> $dayDeo,
+        'kichThuoc' => $kichThuoc,
+    ]);
+
+    return response()->json($items);
+}
     public function getImage($maSanPham)
     {
         $product = Product::where('maSanPham', $maSanPham)->firstOrFail();
@@ -219,45 +241,5 @@ class ProductController extends Controller
         
     }
     
-
-    public function filter(Request $request)
-    {
-        $filters = $request->only(['maChatLieu', 'maKichThuoc', 'maHinhDang', 'maCCHD', 'maDayDeo']);
-        $query = Product::query()
-            ->join('tchitietsp', 'tsanpham.maSanPham', '=', 'tchitietsp.maSanPham')
-            ->join('tcchd', 'tchitietsp.maCCHD', '=', 'tcchd.maCCHD')
-            ->join('tchatlieu', 'tchitietsp.maChatLieu', '=', 'tchatlieu.maCL')
-            ->join('tdaydeo', 'tchitietsp.maDayDeo', '=', 'tdaydeo.maDayDeo')
-            ->join('thinhdang', 'tchitietsp.maHinhDang', '=', 'thinhdang.maHinhDang')
-            ->join('tkichthuoc', 'tchitietsp.maKichThuoc', '=', 'tkichthuoc.maKichThuoc')
-            ->join('tloai', 'tsanpham.maLoai', '=', 'tloai.maLoai')
-            ->join('tthuonghieu', 'tsanpham.maThuongHieu', '=', 'tthuonghieu.maThuongHieu');
-
-        $query->where(function ($query) use ($filters) {
-            foreach ($filters as $field => $value) {
-                if (!empty($value)) {
-                    // Kiểm tra nếu $field là một mảng giá trị
-                    if (is_array($value)) {
-                        $query->whereIn('tchitietsp.' . $field, $value);
-                    } else {
-                        $query->where('tchitietsp.' . $field, $value);
-                    }
-                }
-            }
-        });
-
-        if (!empty($filters['maThuongHieu'])) {
-            $query->where('tthuonghieu.maThuongHieu', $filters['maThuongHieu']);
-        }
-
-        // Thêm điều kiện lọc theo mã loại
-        if (!empty($filters['maLoai'])) {
-            $query->where('tloai.maLoai', $filters['maLoai']);
-        }
-
-        $products = $query->get(['tsanpham.*', 'tloai.*', 'tthuonghieu.*']);
-
-        return response()->json(['products' => $products]);
-    }
 
 }

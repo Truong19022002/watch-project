@@ -8,66 +8,47 @@ use Illuminate\Http\Request;
 
 class RevenueController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $month = $request->query('month');
-    //     $year = $request->query('year');
-
-    //     $revenue = DB::table('thdb')
-    //         ->join('tchitiethdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-    //         ->join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-    //         ->whereMonth('thdb.ngayLapHoaDon', $month)
-    //         ->whereYear('thdb.ngayLapHoaDon', $year)
-    //         ->sum(DB::raw('tsanpham.giaSanPham * tchitiethdb.SL'));
-
-    //     return response()->json(['revenue' => $revenue]);
-    // }
-    // public function index(Request $request)
-    // {
-    //     $month = $request->query('month');
-    //     $year = $request->query('year');
-
-    //     $revenue = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-    //         ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-    //         ->whereMonth('thdb.ngayLapHD', $month)
-    //         ->whereYear('thdb.ngayLapHD', $year)
-    //         ->select(DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as revenue'))
-    //         ->first()
-    //         ->revenue;
-
-    //     return response()->json(['revenue' => $revenue]);
-    // }
-
-    public function revenue()
+    public function Month(Request $request)
     {
-        $revenues = [];
+        // Thống kê theo tháng
+        $monthlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+            ->select(
+                DB::raw('MONTH(thdb.ngayLapHD) as thang'),
+                DB::raw('YEAR(thdb.ngayLapHD) as nam'),
+                DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+            )
+            ->groupBy('thang', 'nam');
+        $monthlyRevenues = $monthlyQuery->get();
 
-        $years = DB::table('thdb')
-            ->select(DB::raw('YEAR(ngayLapHD) as year'))
-            ->distinct()
+        return response()->json(['monthlyRevenues' => $monthlyRevenues]);
+    }
+    public function Quarter(Request $request){
+        // Thống kê theo quý
+        $quarterlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+        ->select(
+            DB::raw('QUARTER(thdb.ngayLapHD) as quy'),
+            DB::raw('YEAR(thdb.ngayLapHD) as nam'),
+            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+        )
+        ->groupBy('quy', 'nam');
+        $quarterlyRevenues = $quarterlyQuery->get();
+        return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
+    }
+    public function revenueByBrand()
+    {
+        $revenueByBrand = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+            ->join('tthuonghieu', 'tsanpham.maThuongHieu', '=', 'tthuonghieu.maThuongHieu')
+            ->select(
+                'tthuonghieu.tenThuongHieu as brand',
+                DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as totalRevenue')
+            )
+            ->groupBy('brand')
+            ->orderByDesc('totalRevenue')
             ->get();
-
-        foreach ($years as $year) {
-            $monthlyRevenues = [];
-
-            for ($month = 1; $month <= 12; $month++) {
-                $revenue = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-                    ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-                    ->whereMonth('thdb.ngayLapHD', $month)
-                    ->whereYear('thdb.ngayLapHD', $year->year)
-                    ->select(DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as revenue'))
-                    ->first()
-                    ->revenue;
-
-                $monthlyRevenues[] = [
-                    'month' => $month,
-                    'revenue' => $revenue,
-                ];
-            }
-
-            $revenues[$year->year] = $monthlyRevenues;
-        }
-
-        return response()->json(['revenues' => $revenues]);
+    
+        return response()->json(['revenueByBrand' => $revenueByBrand]);
     }
 }
