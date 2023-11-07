@@ -66,4 +66,6 @@ Route::get('search',[ProductController::class, 'search']);
 
 Route::post('/media-file',[ProductController::class,'uploadImages']);
 
-Route::get('revenue', [RevenueController::class,'index']);
+Route::get('/monthlyRevenues', [RevenueController::class,'Month']);
+Route::get('/quarterlyRevenues', [RevenueController::class,'Quarter']);
+Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
