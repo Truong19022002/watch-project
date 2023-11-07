@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class ProductDetail extends Model
 {
     // use HasFactory;
@@ -30,7 +30,7 @@ class ProductDetail extends Model
     public function watchShape() : BelongsTo {
         return $this->belongsTo(WatchShape::class, 'maHinhDang', 'maHinhDang');
     }
-    public function imagectsp() : BelongsTo {
-        return $this->belongsTo(ImageSP::class, 'maChiTietSP', 'maChiTietSP');
+    public function imagectsp(): HasMany {
+        return $this->hasMany(ImageSP::class, 'maChiTietSP', 'maChiTietSP');
     }
 }
