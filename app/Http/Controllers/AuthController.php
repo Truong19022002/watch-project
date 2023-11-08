@@ -6,7 +6,8 @@ use App\Models\User;
 use Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use JWTAuth;
+use Illuminate\Support\Facades\JWTAuth;
+
 
 use Illuminate\Http\Request;
 

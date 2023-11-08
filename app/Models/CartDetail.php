@@ -10,12 +10,14 @@ class CartDetail extends Model
 {
     // use HasFactory;
     protected $table = 'tchitietgh';
+    protected $primaryKey = 'maChiTietGH';
     public $timestamps = false;
     protected $fillable = [
         'maChiTietGH', 
         'maGioHang', 
         'maSanPham',
-        'ngayThemSP'
+        'ngayThemSP',
+        'soLuongSP'
     ];
 
     public function cart() : BelongsTo {

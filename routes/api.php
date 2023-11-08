@@ -13,6 +13,7 @@ use App\Http\Controllers\CCHDController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\RevenueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,4 +68,13 @@ Route::get('search',[ProductController::class, 'search']);
 
 Route::post('/media-file',[ProductController::class,'uploadImages']);
 
-Route::get('revenue', [RevenueController::class,'index']);
+Route::get('/monthlyRevenues', [RevenueController::class,'Month']);
+Route::get('/quarterlyRevenues', [RevenueController::class,'Quarter']);
+Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
+Route::get('revenue', [RevenueController::class,'revenue']);
+
+Route::get('products/{maSanPham}/image', [ProductController::class,'getImage']);
+
+Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
+
+Route::get('products', [ProductController::class,'filter']);

@@ -45,15 +45,22 @@ class CartController extends Controller
         $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
         $cartCode = $cart->maGioHang;
+        $cartDetailCode = substr(uniqid(), 0, 8);
 
-        $cartDetailCode = 'CD' . Carbon::now()->timestamp;
+        $cartDetail = CartDetail::where('maGioHang', $cartCode)->where('maSanPham', $productId)->first();
 
-        $cartDetail = CartDetail::create([
-            'maChiTietGH' => $cartDetailCode,
-            'maGioHang' => $cartCode,
-            'maSanPham' => $product->maSanPham,
-            'ngayThemSP' => Carbon::now()
-        ]);
+        if($cartDetail) {
+            $cartDetail->soLuongSP += 1;
+            $cartDetail->save();
+        } else {
+            $cartDetail = CartDetail::create([
+                'maChiTietGH' => $cartDetailCode,
+                'maGioHang' => $cartCode,
+                'maSanPham' => $product->maSanPham,
+                'ngayThemSP' => Carbon::now(),
+                'soLuongSP' => 1
+            ]);
+        }
 
         $cart->tongTienGH = $this->calculateTotalPrice($cart);
         $cart->save();
@@ -112,7 +119,8 @@ class CartController extends Controller
 
         foreach ($cartDetails as $cartDetail) {
             $product = $cartDetail->product;
-            $totalPrice += $product->giaSanPham;
+            $soLuong = $cartDetail->soLuongSP;
+            $totalPrice += ($product->giaSanPham * $soLuong);
         }
 
         return $totalPrice;
