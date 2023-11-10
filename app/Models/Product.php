@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     // use HasFactory;
+    protected $primaryKey = 'maSanPham';
+    public $incrementing = false;
     protected $table = 'tsanpham';
     public $timestamps = false;
 
