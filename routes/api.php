@@ -61,6 +61,7 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::post('/register', [ClientController::class, 'register']);
     Route::get('/profile', [ClientController::class, 'me']);
     Route::post('/logout', [ClientController::class, 'logout']);
+    Route::put('/update/{maKhachHang}', [ClientController::class,'update']);
 });
 
 // Route::get('search/{key}',[ProductController::class,'search']);

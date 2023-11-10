@@ -131,8 +131,6 @@ class ProductController extends Controller
         $product->giaSanPham = $request->input('giaSanPham');
         $product->maLoai = $request->input('maLoai');
         $product->maThuongHieu = $request->input('maThuongHieu');
-        // Update other fields accordingly
-
         $product->save();
 
         $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
