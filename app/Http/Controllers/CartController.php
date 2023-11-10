@@ -100,13 +100,13 @@ class CartController extends Controller
     public function destroy(string $id)
     {
         try {
-            $cartDetail = DB::table('tchitietgh')->where('maChiTietGH', $id)->first();
+            $cartDetail = DB::table('tchitietgh')->where('maSanPham', $id)->first();
 
             if (!$cartDetail) {
                 return response()->json(['message' => 'Cart detail not found'], 404);
             }
 
-            DB::table('tchitietgh')->where('maChiTietGH', $id)->delete();
+            DB::table('tchitietgh')->where('maSanPham', $id)->delete();
 
             return response()->json(['message' => 'Cart detail deleted'], 200);
         } catch (\Exception $e) {
