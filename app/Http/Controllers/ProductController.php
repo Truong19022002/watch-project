@@ -63,6 +63,7 @@ class ProductController extends Controller
     $product->moTaSP = $request->input('moTaSP');
     $product->ngayThemSP = Carbon::now();
     $product->maSeri = substr(uniqid(), 0, 12);
+    
     $product->save();
     $maSanPham = $product->maSanPham;
 
@@ -76,6 +77,8 @@ class ProductController extends Controller
     $productDetail->maDayDeo = $request->input('maDayDeo');
     $productDetail->maCCHD = $request->input('maCCHD');
     $productDetail->save();
+
+ 
 
     return response()->json(['message' => 'Product created successfully', 'data' => $product]);
 }

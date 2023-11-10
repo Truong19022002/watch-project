@@ -8,24 +8,41 @@ use Illuminate\Http\Request;
 
 class RevenueController extends Controller
 {
-    public function Month(Request $request)
-{
+    public function MultipleYears(Request $request)
+    {
+        $startYear = $request->input('start_year');
+        $endYear = $request->input('end_year');
+        $selectedYear = $request->input('selected_year');
     
-    $year = $request->input('nam');
-    $monthlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-        ->select(
-            DB::raw('MONTH(thdb.ngayLapHD) as thang'),
-            DB::raw('YEAR(thdb.ngayLapHD) as nam'),
-            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
-        )
-        ->whereYear('thdb.ngayLapHD', $year) 
-        ->groupBy('thang', 'nam');
-
-    $monthlyRevenues = $monthlyQuery->get();
-
-    return response()->json(['monthlyRevenues' => $monthlyRevenues]);
-}
+        $result = [];
+    
+        // Lấy doanh thu cho một năm cụ thể nếu được chỉ định
+        if ($selectedYear) {
+            $monthlyRevenues = $this->getMonthlyRevenues($selectedYear);
+            $result[$selectedYear] = $monthlyRevenues;
+        }
+    
+        // Lấy doanh thu cho nhiều năm liên tiếp
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            if ($year != $selectedYear) {
+                $monthlyRevenues = $this->getMonthlyRevenues($year);
+                $result[$year] = $monthlyRevenues;
+            }
+        }
+    
+        return response()->json(['result' => $result]);
+    }
+    
+    protected function getMonthlyRevenues($year)
+    {
+        return DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+            ->whereYear('thdb.ngayLapHD', $year)
+            ->groupBy(DB::raw('MONTH(thdb.ngayLapHD)'), DB::raw('YEAR(thdb.ngayLapHD)'))
+            ->selectRaw('MONTH(thdb.ngayLapHD) as thang, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+            ->get();
+    }
+    
 
 
     public function Quarter(Request $request)
