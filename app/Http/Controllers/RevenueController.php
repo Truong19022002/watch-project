@@ -9,21 +9,29 @@ use Illuminate\Http\Request;
 class RevenueController extends Controller
 {
     public function Month(Request $request)
-    {
-        // Thống kê theo tháng
-        $monthlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-            ->select(
-                DB::raw('MONTH(thdb.ngayLapHD) as thang'),
-                DB::raw('YEAR(thdb.ngayLapHD) as nam'),
-                DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
-            )
-            ->groupBy('thang', 'nam');
-        $monthlyRevenues = $monthlyQuery->get();
+{
+    
+    $year = $request->input('nam');
+    $monthlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+        ->select(
+            DB::raw('MONTH(thdb.ngayLapHD) as thang'),
+            DB::raw('YEAR(thdb.ngayLapHD) as nam'),
+            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+        )
+        ->whereYear('thdb.ngayLapHD', $year) 
+        ->groupBy('thang', 'nam');
 
-        return response()->json(['monthlyRevenues' => $monthlyRevenues]);
-    }
-    public function Quarter(Request $request){
+    $monthlyRevenues = $monthlyQuery->get();
+
+    return response()->json(['monthlyRevenues' => $monthlyRevenues]);
+}
+
+
+    public function Quarter(Request $request)
+    {
+        $year = $request->input('nam');
+
         // Thống kê theo quý
         $quarterlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
         ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
@@ -32,6 +40,7 @@ class RevenueController extends Controller
             DB::raw('YEAR(thdb.ngayLapHD) as nam'),
             DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
         )
+        ->whereYear('thdb.ngayLapHD', $year) 
         ->groupBy('quy', 'nam');
         $quarterlyRevenues = $quarterlyQuery->get();
         return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
