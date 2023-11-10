@@ -16,17 +16,6 @@ class Client extends Authenticatable implements JWTSubject
     public $timestamps = false;
     protected $primaryKey = 'maKhachHang';
 
-    // protected $fillable = [
-    //     'maKhachHang', 
-    //     'tenKhachHang', 
-    //     'gioiTinh', 
-    //     'diaChi', 
-    //     'SDT', 
-    //     'email', 
-    //     'anhKH',
-    //     'ghiChu', 
-    //     'password', 
-    // ];
 
     protected $hidden = [
         'password',
