@@ -36,6 +36,7 @@ class RevenueController extends Controller
         $quarterlyRevenues = $quarterlyQuery->get();
         return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
     }
+    
     public function revenueByBrand()
     {
         $revenueByBrand = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
@@ -51,4 +52,24 @@ class RevenueController extends Controller
     
         return response()->json(['revenueByBrand' => $revenueByBrand]);
     }
+    
+    public function productsByQuantitySoldLastMonth()
+{
+    $productsByQuantitySold = DB::table('tchitiethdb')
+        ->join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+        ->select(
+            'tsanpham.maSanPham',
+            'tsanpham.tenSanPham as productName',
+            'tchitiethdb.SL as quantitySold',
+            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as totalRevenue')
+        )
+        ->whereBetween('thdb.ngayLapHD', [now()->subMonth(), now()]) // Lọc theo thời gian trong 1 tháng gần đây
+        ->groupBy('tsanpham.maSanPham', 'productName', 'quantitySold')
+        ->orderByDesc('quantitySold') // Sắp xếp theo lượng mua giảm dần
+        ->get();
+
+    return response()->json(['productsByQuantitySold' => $productsByQuantitySold]);
+}
+
 }

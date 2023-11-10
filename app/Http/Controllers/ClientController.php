@@ -3,12 +3,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Client;
-use Auth;
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use JWTAuth;
 
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ClientController extends Controller
 {
@@ -39,6 +39,12 @@ class ClientController extends Controller
 
     public function register(Request $request)
     {
+        $existingUser = Client::where('email', $request->input('email'))->first();
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'Email already exists',
+            ], 400);
+        }
         $client = new Client;
         $client->maKhachHang = rand(10000000, 99999999);
         $client->tenKhachHang = $request->input('tenKhachHang');

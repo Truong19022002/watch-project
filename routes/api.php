@@ -65,6 +65,7 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
 
 // Route::get('search/{key}',[ProductController::class,'search']);
 Route::get('search',[ProductController::class, 'search']);
+Route::get('filter',[ProductController::class, 'filter']);
 
 Route::post('/media-file',[ProductController::class,'uploadImages']);
 
@@ -72,6 +73,7 @@ Route::get('/monthlyRevenues', [RevenueController::class,'Month']);
 Route::get('/quarterlyRevenues', [RevenueController::class,'Quarter']);
 Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
 Route::get('revenue', [RevenueController::class,'revenue']);
+Route::get('/productsByQuantitySoldLastMonth', [RevenueController::class,'productsByQuantitySoldLastMonth']);
 
 Route::get('products/{maSanPham}/image', [ProductController::class,'getImage']);
 
@@ -79,4 +81,5 @@ Route::get('image_detail/{imageCTSP}', [DetailProductController::class, 'getImag
 
 Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
 
-Route::get('products', [ProductController::class,'filter']);
+Route::put('update/{maSanPham}', [ProductController::class, 'update']);
+
