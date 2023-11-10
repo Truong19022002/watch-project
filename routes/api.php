@@ -75,6 +75,8 @@ Route::get('revenue', [RevenueController::class,'revenue']);
 
 Route::get('products/{maSanPham}/image', [ProductController::class,'getImage']);
 
+Route::get('image_detail/{imageCTSP}', [DetailProductController::class, 'getImageByName']);
+
 Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
 
 Route::get('products', [ProductController::class,'filter']);
