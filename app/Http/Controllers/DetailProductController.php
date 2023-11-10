@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImageSP;
 use Illuminate\Http\Request;
 use App\Models\ProductDetail;
 
@@ -44,9 +45,9 @@ class DetailProductController extends Controller
     //     return response()->file($imagePaths[0]);
         
     // }
-    public function getImageDetail($maChiTietSP)
+    public function getImageDetail($maSanPham)
 {
-    $productDetail = ProductDetail::where('maChiTietSP', $maChiTietSP)->first();
+    $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
 
     if (!$productDetail) {
         return response()->json(['error' => 'Chi tiết sản phẩm không tồn tại'], 404);
@@ -74,5 +75,14 @@ class DetailProductController extends Controller
     // Trả về danh sách tên tệp ảnh
     return response()->json(['imageNames' => $imageNames]);
 }
+
+    public function getImageByName($imageCTSP)
+    {
+        $anh = ImageSP::where('imageCTSP', $imageCTSP)->firstOrFail();
+
+        
+        return response()->file(public_path("img_product/{$anh->imageCTSP}"));
+        
+    }
 
 }

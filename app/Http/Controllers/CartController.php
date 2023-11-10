@@ -16,7 +16,9 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart = Cart::with('cartDetail')->get();
+        $userId = auth('client')->user()->maKhachHang;
+
+        $cart = Cart::with('cartDetail')->where('maKhachHang', $userId)->get();
 
         return $cart;
     }
@@ -45,15 +47,22 @@ class CartController extends Controller
         $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
         $cartCode = $cart->maGioHang;
+        $cartDetailCode = substr(uniqid(), 0, 8);
 
-        $cartDetailCode = 'CD' . Carbon::now()->timestamp;
+        $cartDetail = CartDetail::where('maGioHang', $cartCode)->where('maSanPham', $productId)->first();
 
-        $cartDetail = CartDetail::create([
-            'maChiTietGH' => $cartDetailCode,
-            'maGioHang' => $cartCode,
-            'maSanPham' => $product->maSanPham,
-            'ngayThemSP' => Carbon::now()
-        ]);
+        if($cartDetail) {
+            $cartDetail->soLuongSP += 1;
+            $cartDetail->save();
+        } else {
+            $cartDetail = CartDetail::create([
+                'maChiTietGH' => $cartDetailCode,
+                'maGioHang' => $cartCode,
+                'maSanPham' => $product->maSanPham,
+                'ngayThemSP' => Carbon::now(),
+                'soLuongSP' => 1
+            ]);
+        }
 
         $cart->tongTienGH = $this->calculateTotalPrice($cart);
         $cart->save();
@@ -91,13 +100,13 @@ class CartController extends Controller
     public function destroy(string $id)
     {
         try {
-            $cartDetail = DB::table('tchitietgh')->where('maChiTietGH', $id)->first();
+            $cartDetail = DB::table('tchitietgh')->where('maSanPham', $id)->first();
 
             if (!$cartDetail) {
                 return response()->json(['message' => 'Cart detail not found'], 404);
             }
 
-            DB::table('tchitietgh')->where('maChiTietGH', $id)->delete();
+            DB::table('tchitietgh')->where('maSanPham', $id)->delete();
 
             return response()->json(['message' => 'Cart detail deleted'], 200);
         } catch (\Exception $e) {
@@ -112,7 +121,8 @@ class CartController extends Controller
 
         foreach ($cartDetails as $cartDetail) {
             $product = $cartDetail->product;
-            $totalPrice += $product->giaSanPham;
+            $soLuong = $cartDetail->soLuongSP;
+            $totalPrice += ($product->giaSanPham * $soLuong);
         }
 
         return $totalPrice;

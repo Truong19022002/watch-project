@@ -288,7 +288,7 @@ class ProductController extends Controller
         $product = Product::where('maSanPham', $maSanPham)->firstOrFail();
 
         
-        return response()->json(["img_product/{$product->anhSP}"]);
+        return response()->file(public_path("img_product/{$product->anhSP}"));
         
     }
     

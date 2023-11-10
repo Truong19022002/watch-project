@@ -69,6 +69,7 @@ class ClientController extends Controller
             'message' => 'User successfully registered',
             'token'=> $token,
             'user' => $client,
+            'expires_in' => auth()->factory()->getTTL() * 60,
             'cart' => $cart
         ], 200);
     }
