@@ -97,3 +97,4 @@ Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
 
 Route::post('/forgot', [ForgotController::class,'ForgotByEmail']);
 Route::post('/forgotByphone', [ForgotController::class,'ForgotPasswordByPhone']);
+//

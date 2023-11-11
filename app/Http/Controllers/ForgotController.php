@@ -64,5 +64,6 @@ class ForgotController extends Controller
         // dd($people->password);
     }
     //
+    //
     
 }
