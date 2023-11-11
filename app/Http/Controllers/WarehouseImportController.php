@@ -30,8 +30,8 @@ class WarehouseImportController extends Controller
         ->groupBy('pn.maPhieuNhap') // Nhóm kết quả theo mã hóa đơn
       
 
-        ->get();
         ->paginate($pageSize);
+      
 
 
     $detail = DB::table('tncc as tn')
@@ -45,7 +45,7 @@ class WarehouseImportController extends Controller
                 'cpn.giaSPNhap',
             )
         ->selectRaw('(cpn.slNhap * cpn.giaSPNhap) AS ThanhTien')
-        ->get();
+        ->paginate($pageSize);
 
         foreach ($showpn as $item) {
             $maPhieuNhap = $item->maPhieuNhap;

@@ -11,7 +11,6 @@ class BillSaleController extends Controller
     public function showHdb(Request $request)
 {
     $pageSize = 5;
-
     $showhd = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
         ->join('tkhachhang as kh', 'th.maKhachHang', '=', 'kh.maKhachHang')
