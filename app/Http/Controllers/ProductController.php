@@ -126,6 +126,12 @@ class ProductController extends Controller
         $product->maLoai = $request->input('maLoai');
         $product->moTaSP = $request->input('moTaSP'); 
         $product->maThuongHieu = $request->input('maThuongHieu');
+        if ($request->hasFile('anhSP')) {
+            $image = $request->file('anhSP');
+            $imageName = $image->getClientOriginalName(); 
+            $image->move(public_path('img_product'), $imageName); 
+            $product->anhSP = $imageName;
+        }  
         $product->save();
         $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
         if (!$productDetail) {
@@ -137,6 +143,21 @@ class ProductController extends Controller
         $productDetail->maDayDeo = $request->input('maDayDeo');
         $productDetail->maCCHD = $request->input('maCCHD');
         $productDetail->save();
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imageName = $image->getClientOriginalName(); 
+                $image->move(public_path('img_product'), $imageName); 
+                do {
+                    $maAnhCTSP = substr(uniqid(), 0, 8);
+                } while (ImageSP::where('maAnhCTSP', $maAnhCTSP)->exists());
+                $tanHSP = new ImageSP();
+                $tanHSP->maAnhCTSP = $maAnhCTSP;
+                $tanHSP->maChiTietSP = $productDetail->maChiTietSP;
+                $tanHSP->imageCTSP = $imageName;
+                $tanHSP->chuthich = $request->input('chuthich'); 
+                $tanHSP->save();
+            }
+        }
         return response()->json(['message' => 'Product updated successfully', 'data' => $product]);
         }
     public function destroy(string $id)

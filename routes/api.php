@@ -84,5 +84,5 @@ Route::get('image_detail/{imageCTSP}', [DetailProductController::class, 'getImag
 
 Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
 
-Route::put('update/{maSanPham}', [ProductController::class, 'update']);
+Route::post('update/{maSanPham}', [ProductController::class, 'update']);
 
