@@ -9,6 +9,8 @@ class WarehouseImportController extends Controller
 {
     public function showWarehouseImport(Request $request)
     {
+        $pageSize = 5;
+
         // $result = DB::table('tchitietpn')->get();
 
         // return response()->json($result, 200);
@@ -26,7 +28,11 @@ class WarehouseImportController extends Controller
         )
         ->selectRaw('SUM(cpn.slNhap * cpn.giaSPNhap) AS tongTienHDN')
         ->groupBy('pn.maPhieuNhap') // Nhóm kết quả theo mã hóa đơn
+      
+
         ->get();
+        ->paginate($pageSize);
+
 
     $detail = DB::table('tncc as tn')
         ->leftJoin('tphieunhap as pn', 'tn.maNCC', '=', 'pn.maNCC')

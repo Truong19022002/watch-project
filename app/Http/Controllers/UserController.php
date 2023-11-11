@@ -19,7 +19,8 @@ class UserController extends Controller
     }
     public function showUser(Request $request)
     {
-        $result = DB::table('ttaikhoan')->get();
+        $pageSize = $request->input('pageSize', 5);
+        $result = DB::table('ttaikhoan')->paginate($pageSize);
 
         return response()->json($result, 200);
         

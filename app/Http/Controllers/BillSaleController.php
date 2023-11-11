@@ -10,6 +10,8 @@ class BillSaleController extends Controller
 {
     public function showHdb(Request $request)
 {
+    $pageSize = 5;
+
     $showhd = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
         ->join('tkhachhang as kh', 'th.maKhachHang', '=', 'kh.maKhachHang')
@@ -25,49 +27,51 @@ class BillSaleController extends Controller
             'th.giamGia'
         )
         ->selectRaw('SUM(ct.SL * sp.giaSanPham) as tongTienHDB')
-        ->groupBy('th.maHDB') // Nhóm kết quả theo mã hóa đơn
-        ->get();
+        ->groupBy('th.maHDB')
+        ->paginate($pageSize);
 
+    // You can use the same pagination for the details query
     $detail = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
         ->join('tsanpham as sp', 'ct.maSanPham', '=', 'sp.maSanPham')
         ->select(
             'th.maHDB',
-            'sp.tenSanPham', 
+            'sp.tenSanPham',
             DB::raw('ct.SL AS soLuong'),
             'sp.giaSanPham'
         )
         ->selectRaw('(ct.SL * sp.giaSanPham) AS ThanhTien')
-        ->get();
-        
+        ->paginate($pageSize);
 
-        foreach ($showhd as $item) {
-            $maHDB = $item->maHDB;
+    // Combine the results and return as JSON
+    $result = [];
+    foreach ($showhd as $item) {
+        $maHDB = $item->maHDB;
 
-            // Tạo mảng mới chứa thông tin từ $showhd
-            $combinedItem = (array)$item;
+        // Tạo mảng mới chứa thông tin từ $showhd
+        $combinedItem = (array)$item;
 
-            // Tạo mảng chứa chi tiết từ $detail
-            $details = [];
-            foreach ($detail as $detailItem) {
-                if ($detailItem->maHDB === $maHDB) {
-                    $details[] = [
-                        'maHDB' => $detailItem->maHDB,
-                        'soLuong' => $detailItem->soLuong,
-                        'tenSanPham'=>$detailItem->tenSanPham,
-                        'giaSanPham' => $detailItem->giaSanPham,
-                        'ThanhTien' => $detailItem->ThanhTien,
-                    ];
-                }
+        // Tạo mảng chứa chi tiết từ $detail
+        $details = [];
+        foreach ($detail as $detailItem) {
+            if ($detailItem->maHDB === $maHDB) {
+                $details[] = [
+                    'maHDB' => $detailItem->maHDB,
+                    'soLuong' => $detailItem->soLuong,
+                    'tenSanPham' => $detailItem->tenSanPham,
+                    'giaSanPham' => $detailItem->giaSanPham,
+                    'ThanhTien' => $detailItem->ThanhTien,
+                ];
             }
-    
-            $combinedItem['details'] = $details;
-    
-            $result[] = $combinedItem;
         }
-    
-        return response()->json(['showhd' => $result]);
+
+        $combinedItem['details'] = $details;
+
+        $result[] = $combinedItem;
     }
-   
+
+    return response()->json(['showhd' => $result]);
+}
+
     //
 }
