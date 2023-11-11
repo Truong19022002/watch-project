@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class BillSaleController extends Controller
 {
     public function showHdb(Request $request)
-{
+    {
     $pageSize = 5;
     $showhd = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
