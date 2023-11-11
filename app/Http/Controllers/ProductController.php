@@ -59,7 +59,12 @@ class ProductController extends Controller
     $product->maLoai = $request->input('maLoai');
     $product->maThuongHieu = $request->input('maThuongHieu');
     $product->slTonKho = null;
-    $product->anhSP = null;
+    if ($request->hasFile('anhSP')) {
+        $image = $request->file('anhSP');
+        $imageName = $image->getClientOriginalName(); 
+        $image->move(public_path('img_product'), $imageName); 
+        $product->anhSP = $imageName;
+    }    
     $product->moTaSP = $request->input('moTaSP');
     $product->ngayThemSP = Carbon::now();
     $product->maSeri = substr(uniqid(), 0, 12);
@@ -78,10 +83,26 @@ class ProductController extends Controller
     $productDetail->maCCHD = $request->input('maCCHD');
     $productDetail->save();
 
- 
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $imageName = $image->getClientOriginalName(); 
+            $image->move(public_path('img_product'), $imageName); 
+            do {
+                $maAnhCTSP = substr(uniqid(), 0, 8);
+            } while (ImageSP::where('maAnhCTSP', $maAnhCTSP)->exists());
+
+            $tanHSP = new ImageSP();
+            $tanHSP->maAnhCTSP = $maAnhCTSP;
+            $tanHSP->maChiTietSP = $productDetail->maChiTietSP;
+            $tanHSP->imageCTSP = $imageName;
+            $tanHSP->chuthich = $request->input('chuthich'); 
+            $tanHSP->save();
+        }
+    }
 
     return response()->json(['message' => 'Product created successfully', 'data' => $product]);
 }
+
 
 
 

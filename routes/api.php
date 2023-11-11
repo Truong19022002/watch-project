@@ -71,7 +71,7 @@ Route::get('filter',[ProductController::class, 'filter']);
 Route::post('/media-file',[ProductController::class,'uploadImages']);
 
 Route::get('/monthlyRevenues', [RevenueController::class,'MultipleYears']);
-Route::get('/quarterlyRevenues', [RevenueController::class,'Quarter']);
+Route::get('/quarterlyRevenues', [RevenueController::class,'QuarterMultipleYears']);
 Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
 Route::get('revenue', [RevenueController::class,'revenue']);
 Route::get('/productsByQuantitySoldLastMonth', [RevenueController::class,'productsByQuantitySoldLastMonth']);
