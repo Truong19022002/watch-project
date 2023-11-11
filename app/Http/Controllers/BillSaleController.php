@@ -10,7 +10,9 @@ class BillSaleController extends Controller
 {
     public function showHdb(Request $request)
     {
-    $pageSize = 5;
+    $pageSize = $request->get('pageSize', 10);
+    $page = $request->has('page') ? $request->query('page') : 1;
+
     $showhd = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
         ->join('tkhachhang as kh', 'th.maKhachHang', '=', 'kh.maKhachHang')
@@ -27,7 +29,8 @@ class BillSaleController extends Controller
         )
         ->selectRaw('SUM(ct.SL * sp.giaSanPham) as tongTienHDB')
         ->groupBy('th.maHDB') // Nhóm kết quả theo mã hóa đơn
-        ->get();
+        ->paginate($pageSize, ['*'], 'page', $page);
+
 
     $detail = DB::table('thdb as th')
         ->leftJoin('tchitiethdb as ct', 'th.maHDB', '=', 'ct.maHDB')
@@ -39,7 +42,7 @@ class BillSaleController extends Controller
             'sp.giaSanPham'
         )
         ->selectRaw('(ct.SL * sp.giaSanPham) AS ThanhTien')
-        ->get();
+        ->paginate($pageSize, ['*'], 'page', $page);
         
 
         foreach ($showhd as $item) {
