@@ -118,13 +118,11 @@ class CartController extends Controller
     {
         $cartDetails = $cart->cartDetail;
         $totalPrice = 0;
-
         foreach ($cartDetails as $cartDetail) {
             $product = $cartDetail->product;
             $soLuong = $cartDetail->soLuongSP;
             $totalPrice += ($product->giaSanPham * $soLuong);
         }
-
         return $totalPrice;
     }
 }

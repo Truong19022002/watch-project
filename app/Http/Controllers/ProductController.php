@@ -48,10 +48,7 @@ class ProductController extends Controller
         'maChatlieu' => 'required',
         'maDayDeo' => 'required',
         'maCCHD' => 'required',
-        // 'maAnhCTSP' => 'required',
     ]);
-
-    // Lưu Product
     $product = new Product();
     $product->maSanPham = substr(uniqid(), 0, 8);
     $product->tenSanPham = $request->input('tenSanPham');
@@ -67,12 +64,9 @@ class ProductController extends Controller
     }    
     $product->moTaSP = $request->input('moTaSP');
     $product->ngayThemSP = Carbon::now();
-    $product->maSeri = substr(uniqid(), 0, 12);
-    
+    $product->maSeri = substr(uniqid(), 0, 12); 
     $product->save();
     $maSanPham = $product->maSanPham;
-
-    // Lưu ProductDetail
     $productDetail = new ProductDetail();
     $productDetail->maSanPham = $maSanPham;
     $productDetail->maChiTietSP = substr(uniqid(), 0, 8);
@@ -82,7 +76,6 @@ class ProductController extends Controller
     $productDetail->maDayDeo = $request->input('maDayDeo');
     $productDetail->maCCHD = $request->input('maCCHD');
     $productDetail->save();
-
     if ($request->hasFile('images')) {
         foreach ($request->file('images') as $image) {
             $imageName = $image->getClientOriginalName(); 
@@ -90,7 +83,6 @@ class ProductController extends Controller
             do {
                 $maAnhCTSP = substr(uniqid(), 0, 8);
             } while (ImageSP::where('maAnhCTSP', $maAnhCTSP)->exists());
-
             $tanHSP = new ImageSP();
             $tanHSP->maAnhCTSP = $maAnhCTSP;
             $tanHSP->maChiTietSP = $productDetail->maChiTietSP;
@@ -102,14 +94,6 @@ class ProductController extends Controller
 
     return response()->json(['message' => 'Product created successfully', 'data' => $product]);
 }
-
-
-
-
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $product = DB::table('view_product')->where('maSanPham', $id)->first();
@@ -119,18 +103,6 @@ class ProductController extends Controller
             'addToCartUrl' => $addToCartUrl
         ]);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */ 
     public function update(Request $request, $maSanPham)
         {
         $request->validate([
@@ -146,39 +118,27 @@ class ProductController extends Controller
         ]);
 
         $product = Product::where('maSanPham', $maSanPham)->first();
-
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
-
         $product->tenSanPham = $request->input('tenSanPham');
         $product->giaSanPham = $request->input('giaSanPham');
         $product->maLoai = $request->input('maLoai');
+        $product->moTaSP = $request->input('moTaSP'); 
         $product->maThuongHieu = $request->input('maThuongHieu');
         $product->save();
-
         $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
-
         if (!$productDetail) {
             return response()->json(['message' => 'Product detail not found'], 404);
         }
-
         $productDetail->maKichThuoc = $request->input('maKichThuoc');
         $productDetail->maHinhDang = $request->input('maHinhDang');
         $productDetail->maChatlieu = $request->input('maChatlieu');
         $productDetail->maDayDeo = $request->input('maDayDeo');
         $productDetail->maCCHD = $request->input('maCCHD');
-
         $productDetail->save();
-
         return response()->json(['message' => 'Product updated successfully', 'data' => $product]);
         }
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
@@ -192,20 +152,17 @@ class ProductController extends Controller
                 throw new ModelNotFoundException('Product not found');
             }
             DB::table('tsanpham')->where('maSanPham', $id)->delete();
-
             return response()->json(['message' => 'Product deleted successfully']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete product', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
     public function getListId(Request $request)
     {
         $ids = $request->input('ids');
 
         $foundIds = [];
         $notFoundIds = [];
-
         foreach ($ids as $id) {
             $product = DB::table('tsanpham')->where('maSanPham', $id)->first();
 
@@ -246,8 +203,7 @@ class ProductController extends Controller
     $query = DB::table('view_product')->where('tenSanPham', 'like', '%'.$keyword.'%');
     $items = $query->paginate($pageSize);
     $items->appends([
-        'keyword' => $keyword,
-        
+        'keyword' => $keyword,       
     ]);
     return response()->json($items);
     }

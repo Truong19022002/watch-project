@@ -55,6 +55,8 @@ Route::middleware(['user'])->prefix('/auth/admin')->group(function() {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/profile', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/update/{idUser}', [AuthController::class,'update']);
+
 });
 
 Route::middleware(['client'])->prefix('/auth/user')->group(function() {
@@ -64,7 +66,6 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::post('/logout', [ClientController::class, 'logout']);
     Route::put('/update/{maKhachHang}', [ClientController::class,'update']);
 });
-
 // Route::get('search/{key}',[ProductController::class,'search']);
 Route::get('search',[ProductController::class, 'search']);
 Route::get('filter',[ProductController::class, 'filter']);

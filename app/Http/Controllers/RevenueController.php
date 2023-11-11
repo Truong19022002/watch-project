@@ -96,7 +96,7 @@ class RevenueController extends Controller
         ->whereBetween('thdb.ngayLapHD', [now()->subMonth(), now()]) // Lọc theo thời gian trong 1 tháng gần đây
         ->groupBy('tsanpham.maSanPham', 'productName', 'quantitySold')
         ->orderByDesc('quantitySold') // Sắp xếp theo lượng mua giảm dần
-        ->get();
+        ->get();    
 
     return response()->json(['productsByQuantitySold' => $productsByQuantitySold]);
 }
