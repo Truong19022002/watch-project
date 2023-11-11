@@ -64,21 +64,7 @@ class RevenueController extends Controller
         ->selectRaw('QUARTER(thdb.ngayLapHD) as quy, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
         ->get();
     }
-    // public function Quarter(Request $request)
-    // {
-    //     $year = $request->input('nam');
-    //     $quarterlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-    //     ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-    //     ->select(
-    //         DB::raw('QUARTER(thdb.ngayLapHD) as quy'),
-    //         DB::raw('YEAR(thdb.ngayLapHD) as nam'),
-    //         DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
-    //     )
-    //     ->whereYear('thdb.ngayLapHD', $year) 
-    //     ->groupBy('quy', 'nam');
-    //     $quarterlyRevenues = $quarterlyQuery->get();
-    //     return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
-    // }
+    
     
     public function revenueByBrand()
     {
