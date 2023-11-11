@@ -5,24 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartDetail;
+use App\Models\BillSale;
+use App\Models\DetailBillSale;
 
 class CheckoutController extends Controller
 {
     public function vnpay_payment(Request $request) {
         $userId = auth('client')->user()->maKhachHang;
 
-        $cart = Cart::with('cartDetail')->where('maKhachHang', $userId)->first();
-        $tongTienGH = $cart -> tongTienGH;
+        $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "https://www.facebook.com/vngtnthnh3101/";
+        $vnp_Returnurl = "http://127.0.0.1:8000/api/bill";
         $vnp_TmnCode = "FLQYP5IJ";//Mã website tại VNPAY 
         $vnp_HashSecret = "JBOUUFLRZBNYQBEQHKFOHSCDRSVTNVRM"; //Chuỗi bí mật
 
         $vnp_TxnRef = rand(10000000, 99999999); //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
         $vnp_OrderInfo = 'Thanh toan VNPAY';
         $vnp_OrderType = 'billpayment';
-        $vnp_Amount = $tongTienGH * 100;
+        $vnp_Amount = $cart->tongTienGH * 100;
         $vnp_Locale = 'vn';
         $vnp_BankCode = 'NCB';
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
@@ -49,7 +50,6 @@ class CheckoutController extends Controller
             $inputData['vnp_BankCode'] = $vnp_BankCode;
         }
 
-        //var_dump($inputData);
         ksort($inputData);
         $query = "";
         $i = 0;
@@ -66,7 +66,7 @@ class CheckoutController extends Controller
 
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
-            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret);//  
+            $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
         $returnData = array('code' => '00'
@@ -76,5 +76,37 @@ class CheckoutController extends Controller
         $result = json_encode($returnData);
 
         return $result;
+    }
+
+    public function updateBill(Request $request) {
+        $userId = auth('client')->user()->maKhachHang;
+
+        $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
+        $cartCode = $cart->maGioHang;
+        $cartDetails = CartDetail::where('maGioHang', $cartCode)->get();
+
+        $data = $request->query();
+
+        $bill = BillSale::create([
+            'maHDB' => $data['vnp_BankTranNo'],
+            'maKhachHang' => $userId,
+            'ngayLapHD' => $data['vnp_PayDate'],
+            'giamGia' => null,
+            'PTTT' => $data['vnp_CardType'],
+            'tongTienHDB' => $data['vnp_Amount']
+        ]);
+
+        foreach ($cartDetails as $cartDetail) {
+            $product = $cartDetail->product;
+
+            DetailBillSale::create([
+                'maChiTietHDB' => rand(10000000, 99999999),
+                'maHDB' => $bill->maHDB,
+                'maSanPham' => $cartDetail->maSanPham,
+                'SL' => $product->soLuongSP,
+                'thanhTien' => $product->giaSanPham
+            ]);
+        }
+        return $bill;
     }
 }

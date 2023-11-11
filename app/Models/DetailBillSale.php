@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class DetailBillSale extends Model
 {
     protected $table = 'tchitiethdb';
+    public $timestamps = false;
+    protected $fillable = [
+        'maChiTietHDB', 'maHDB', 'maSanPham', 'SL', 'thanhTien'
+    ];
     public function hoaDonBan()
     {
         return $this->belongsTo(BillSale::class, 'maHDB', 'maHDB');
