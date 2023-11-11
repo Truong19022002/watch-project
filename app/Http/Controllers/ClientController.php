@@ -51,27 +51,21 @@ class ClientController extends Controller
     } catch (\Exception $e) {
         return response()->json(['message' => 'Unauthenticated.'], 401);
     }
-
-    
     if ($user->maKhachHang != $maKhachHang) {
         return response()->json(['message' => 'Unauthorized.'], 403);
     }
-
     $client = Client::where('maKhachHang', $maKhachHang)->first();
     if (!$client) {
         return response()->json(['message' => 'Client not found'], 404);
     }
-
     $client->tenKhachHang = $request->input('tenKhachHang');
     $client->gioiTinh = $request->input('gioiTinh');
     $client->diaChi = $request->input('diaChi');
     $client->SDT = $request->input('SDT');
     $client->email = $request->input('email');
     $client->save();
-
     return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
     }
-
     public function register(Request $request)
     {
         $existingUser = Client::where('email', $request->input('email'))->first();

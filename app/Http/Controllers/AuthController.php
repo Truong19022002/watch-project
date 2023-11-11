@@ -41,7 +41,6 @@ class AuthController extends Controller
         'firstName' => 'required',
         'lastName' => 'required',
         'contact' => 'required',
-        'password' => 'required',
         'email' => 'required',
 
     ]);
@@ -67,11 +66,10 @@ class AuthController extends Controller
     $User->lastName = $request->input('lastName');
     $User->contact = $request->input('contact');
     $User->email = $request->input('email');
-    $User->password = $request->input('password');
 
     $User->save();
 
-    return response()->json(['message' => 'Client updated successfully', 'data' => $User]);
+    return response()->json(['message' => 'Admin updated successfully', 'data' => $User]);
     }
     public function register(Request $request)
     {
