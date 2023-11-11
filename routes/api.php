@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillSaleController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
@@ -15,8 +16,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\WarehouseImportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +68,7 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::get('/profile', [ClientController::class, 'me']);
     Route::post('/logout', [ClientController::class, 'logout']);
     Route::put('/update/{maKhachHang}', [ClientController::class,'update']);
+
 });
 // Route::get('search/{key}',[ProductController::class,'search']);
 Route::get('search',[ProductController::class, 'search']);
@@ -86,3 +90,9 @@ Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::clas
 
 Route::post('update/{maSanPham}', [ProductController::class, 'update']);
 
+Route::get('/showUser', [UserController::class,'showUser']);
+Route::get('/showHdb', [BillSaleController::class, 'showHdb']);
+Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
+
+// Route::post('/forgotByemail', [ClientController::class,'ForgotByEmail']);
+// Route::post('/forgotByphone', [ClientController::class,'ForgotPasswordByPhone']);
