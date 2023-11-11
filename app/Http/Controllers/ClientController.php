@@ -3,12 +3,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Client;
-use Auth;
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use JWTAuth;
 
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ClientController extends Controller
 {
@@ -36,9 +36,52 @@ class ClientController extends Controller
 
         return $this->respondWithToken($token);
     }
+    public function update(Request $request, $maKhachHang)
+    {
+    $request->validate([
+        'tenKhachHang' => 'required',
+        'username' => 'required',
+        'gioiTinh' => 'required',
+        'diaChi' => 'required',
+        'SDT' => 'required',
+        'email' => 'required',
+    ]);
+
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Unauthenticated.'], 401);
+    }
+
+    
+    if ($user->maKhachHang != $maKhachHang) {
+        return response()->json(['message' => 'Unauthorized.'], 403);
+    }
+
+    $client = Client::where('maKhachHang', $maKhachHang)->first();
+    if (!$client) {
+        return response()->json(['message' => 'Client not found'], 404);
+    }
+
+    $client->tenKhachHang = $request->input('tenKhachHang');
+    $client->username = $request->input('username');
+    $client->gioiTinh = $request->input('gioiTinh');
+    $client->diaChi = $request->input('diaChi');
+    $client->SDT = $request->input('SDT');
+    $client->email = $request->input('email');
+    $client->save();
+
+    return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
+    }
 
     public function register(Request $request)
     {
+        $existingUser = Client::where('email', $request->input('email'))->first();
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'Email already exists',
+            ], 400);
+        }
         $client = new Client;
         $client->maKhachHang = rand(10000000, 99999999);
         $client->tenKhachHang = $request->input('tenKhachHang');

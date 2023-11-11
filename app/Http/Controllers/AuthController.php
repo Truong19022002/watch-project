@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\JWTAuth;
-
 
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -41,6 +39,18 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Check if the email already exists
+        $existingUser = User::where('email', $request->input('email'))->first();
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'Email already exists',
+                'error' => 'duplicateEmail',
+            ], 400);
+
+            
+        }
+    
+        // If the email doesn't exist, proceed with user registration
         $user = new User;
         $user->idUser = rand(1000000, 99999999);
         $user->username = $request->input('username');
@@ -50,16 +60,17 @@ class AuthController extends Controller
         $user->contact = $request->input('contact');
         $user->maChucVu = $request->input('maChucVu');
         $user->password = Hash::make($request->input('password'));
-
+    
         $user->save();
-        // $newUser = User::where('idUser', $user->idUser)->first();
+        
         $token = JWTAuth::fromUser($user);
-
+    
         return response()->json([
             'message' => 'User successfully registered',
             'user' => $user
         ], 200);
     }
+    
 
     public function me()
     {

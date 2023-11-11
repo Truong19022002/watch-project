@@ -37,47 +37,54 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'tenSanPham' => 'required',
-            'giaSanPham' => 'required',
-            'maLoai' => 'required',
-            'maThuongHieu' => 'required',
-            'maKichThuoc' => 'required',
-            'maHinhDang' => 'required',
-            'maChatlieu' => 'required',
-            'maDayDeo' => 'required',
-            'maCCHD' => 'required',
-            // 'maAnhCTSP' => 'required',
-        ]);
+{
+    $request->validate([
+        'tenSanPham' => 'required',
+        'giaSanPham' => 'required',
+        'maLoai' => 'required',
+        'maThuongHieu' => 'required',
+        'maKichThuoc' => 'required',
+        'maHinhDang' => 'required',
+        'maChatlieu' => 'required',
+        'maDayDeo' => 'required',
+        'maCCHD' => 'required',
+        // 'maAnhCTSP' => 'required',
+    ]);
 
-        $product = new Product();
-        $product->maSanPham = substr(uniqid(), 0, 8);
-        $product->tenSanPham = $request->input('tenSanPham');
-        $product->giaSanPham = $request->input('giaSanPham');
-        $product->maLoai = $request->input('maLoai');
-        $product->maThuongHieu = $request->input('maThuongHieu');
-        $product->slTonKho = null;
-        $product->anhSP = null;
-        // $product->anhSP=$request -> file('anhSP')->store('tsanpham');
+    // Lưu Product
+    $product = new Product();
+    $product->maSanPham = substr(uniqid(), 0, 8);
+    $product->tenSanPham = $request->input('tenSanPham');
+    $product->giaSanPham = $request->input('giaSanPham');
+    $product->maLoai = $request->input('maLoai');
+    $product->maThuongHieu = $request->input('maThuongHieu');
+    $product->slTonKho = null;
+    $product->anhSP = null;
+    $product->moTaSP = $request->input('moTaSP');
+    $product->ngayThemSP = Carbon::now();
+    $product->maSeri = substr(uniqid(), 0, 12);
+    
+    $product->save();
+    $maSanPham = $product->maSanPham;
 
-        $product->moTaSP = $request->input('moTaSP');
-        $product->ngayThemSP = Carbon::now();
-        $product->maSeri = substr(uniqid(), 0, 12);
-        $product->save();
+    // Lưu ProductDetail
+    $productDetail = new ProductDetail();
+    $productDetail->maSanPham = $maSanPham;
+    $productDetail->maChiTietSP = substr(uniqid(), 0, 8);
+    $productDetail->maKichThuoc = $request->input('maKichThuoc');
+    $productDetail->maHinhDang = $request->input('maHinhDang');
+    $productDetail->maChatlieu = $request->input('maChatlieu');
+    $productDetail->maDayDeo = $request->input('maDayDeo');
+    $productDetail->maCCHD = $request->input('maCCHD');
+    $productDetail->save();
 
-        $productDetail = new ProductDetail();
-        $productDetail->maSanPham = $product->maSanPham;
-        $productDetail->maChiTietSP = substr(uniqid(), 0, 8);
-        $productDetail->maKichThuoc = $request->input('maKichThuoc');
-        $productDetail->maHinhDang = $request->input('maHinhDang');
-        $productDetail->maChatlieu = $request->input('maChatlieu');
-        $productDetail->maDayDeo = $request->input('maDayDeo');
-        $productDetail->maCCHD = $request->input('maCCHD');
-        $productDetail->save();
-        
-        return response()->json(['message' => 'Product created successfully', 'data' => $product]);
-    }
+ 
+
+    return response()->json(['message' => 'Product created successfully', 'data' => $product]);
+}
+
+
+
 
     /**
      * Display the specified resource.
@@ -102,11 +109,51 @@ class ProductController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+     */ 
+    public function update(Request $request, $maSanPham)
+        {
+        $request->validate([
+            'tenSanPham' => 'required',
+            'giaSanPham' => 'required',
+            'maLoai' => 'required',
+            'maThuongHieu' => 'required',
+            'maKichThuoc' => 'required',
+            'maHinhDang' => 'required',
+            'maChatlieu' => 'required',
+            'maDayDeo' => 'required',
+            'maCCHD' => 'required',
+        ]);
+
+        $product = Product::where('maSanPham', $maSanPham)->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        $product->tenSanPham = $request->input('tenSanPham');
+        $product->giaSanPham = $request->input('giaSanPham');
+        $product->maLoai = $request->input('maLoai');
+        $product->maThuongHieu = $request->input('maThuongHieu');
+        $product->save();
+
+        $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
+
+        if (!$productDetail) {
+            return response()->json(['message' => 'Product detail not found'], 404);
+        }
+
+        $productDetail->maKichThuoc = $request->input('maKichThuoc');
+        $productDetail->maHinhDang = $request->input('maHinhDang');
+        $productDetail->maChatlieu = $request->input('maChatlieu');
+        $productDetail->maDayDeo = $request->input('maDayDeo');
+        $productDetail->maCCHD = $request->input('maCCHD');
+
+        $productDetail->save();
+
+        return response()->json(['message' => 'Product updated successfully', 'data' => $product]);
+        }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -171,73 +218,78 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete products', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
     public function search(Request $request)
-{
+    {
     $keyword = $request->get('keyword');
     $pageSize = $request->get('pageSize', 10);
-    $minPrice = $request->get('minPrice');
-    $maxPrice = $request->get('maxPrice');
-    $orderBy = $request->get('orderBy');
-    $gioiTinh = $request->get('gioiTinh');
-    $chatLieu = $request->get('chatLieu');
-    $hinhDang = $request->get('hinhDang');
-    $CCDH = $request->get('CCDH');
-    $dayDeo = $request ->get('dayDeo');
-    $kichThuoc = $request->get('kichThuoc');
     $query = DB::table('view_product')->where('tenSanPham', 'like', '%'.$keyword.'%');
-
-    if (!empty($minPrice)) {
-        $query->where('giaSanPham', '>=', $minPrice);
-    }
-
-    if (!empty($maxPrice)) {
-        $query->where('giaSanPham', '<=', $maxPrice);
-    }
-    if (!empty($gioiTinh)) {
-        $query->where('tenLoai', 'LIKE', '%'.$gioiTinh.'%');
-    }
-    if (!empty($chatLieu)) {
-        $query->where('tenCL', 'LIKE', '%'.$chatLieu.'%');
-    }
-    if (!empty($hinhDang)) {
-        $query->where('tenHinhDang', 'LIKE', '%'.$hinhDang.'%');
-    }
-    if (!empty($CCDH)) {
-        $query->where('tenCCDH', 'LIKE', '%'.$CCDH.'%');
-    }
-    if (!empty($dayDeo)) {
-        $query->where('loaiDayDeo', 'LIKE', '%'.$dayDeo.'%');
-    }
-    if (!empty($kichThuoc)) {
-        $query->where('kichThuoc', 'LIKE', '%'.$kichThuoc.'%');
-    }
-    $query->orderBy('giaSanPham', $orderBy);
-
     $items = $query->paginate($pageSize);
     $items->appends([
         'keyword' => $keyword,
-        'minPrice' => $minPrice,
-        'maxPrice' => $maxPrice,
-        'orderBy' => $orderBy,
-        'gioiTinh' => $gioiTinh,
-        'chatLieu'=> $chatLieu,
-        'hinhDang' => $hinhDang,
-        'CCDH' => $CCDH,
-        'dayDeo'=> $dayDeo,
-        'kichThuoc' => $kichThuoc,
+        
     ]);
-
     return response()->json($items);
-}
+    }
+    public function Filter(Request $request){
+        $pageSize = $request->get('pageSize', 10);
+        $minPrice = $request->get('minPrice');
+        $maxPrice = $request->get('maxPrice');
+        $orderBy = $request->get('orderBy');
+        $gioiTinh = $request->get('gioiTinh');
+        $chatLieu = $request->get('chatLieu');
+        $hinhDang = $request->get('hinhDang');
+        $CCDH = $request->get('CCDH');
+        $dayDeo = $request ->get('dayDeo');
+        $kichThuoc = $request->get('kichThuoc');
+        $query = DB::table('view_product');
+        if (!empty($minPrice)) {
+            $query->where('giaSanPham', '>=', $minPrice);
+        }
+    
+        if (!empty($maxPrice)) {
+            $query->where('giaSanPham', '<=', $maxPrice);
+        }
+        if (!empty($gioiTinh)) {
+            $query->where('tenLoai', 'LIKE', '%'.$gioiTinh.'%');
+        }
+        if (!empty($chatLieu)) {
+            $query->where('tenCL', 'LIKE', '%'.$chatLieu.'%');
+        }
+        if (!empty($hinhDang)) {
+            $query->where('tenHinhDang', 'LIKE', '%'.$hinhDang.'%');
+        }
+        if (!empty($CCDH)) {
+            $query->where('tenCCDH', 'LIKE', '%'.$CCDH.'%');
+        }
+        if (!empty($dayDeo)) {
+            $query->where('loaiDayDeo', 'LIKE', '%'.$dayDeo.'%');
+        }
+        if (!empty($kichThuoc)) {
+            $query->where('kichThuoc', 'LIKE', '%'.$kichThuoc.'%');
+        }
+        $query->orderBy('giaSanPham', $orderBy);
+    
+        $items = $query->paginate($pageSize);
+        $items->appends([
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'orderBy' => $orderBy,
+            'gioiTinh' => $gioiTinh,
+            'chatLieu'=> $chatLieu,
+            'hinhDang' => $hinhDang,
+            'CCDH' => $CCDH,
+            'dayDeo'=> $dayDeo,
+            'kichThuoc' => $kichThuoc,
+        ]);
+    
+        return response()->json($items);
+    }
     public function getImage($maSanPham)
     {
         $product = Product::where('maSanPham', $maSanPham)->firstOrFail();
 
         
-        return response()->json(["img_product/{$product->anhSP}"]);
+        return response()->file(public_path("img_product/{$product->anhSP}"));
         
     }
     

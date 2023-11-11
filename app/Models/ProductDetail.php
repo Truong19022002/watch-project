@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ProductDetail extends Model
 {
     // use HasFactory;
+    protected $primaryKey = 'maChiTietSP';
+
     protected $table = 'tchitietsp';
     public $timestamps = false;
 

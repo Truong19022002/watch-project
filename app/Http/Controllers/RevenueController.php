@@ -8,22 +8,47 @@ use Illuminate\Http\Request;
 
 class RevenueController extends Controller
 {
-    public function Month(Request $request)
+    public function MultipleYears(Request $request)
     {
-        // Thống kê theo tháng
-        $monthlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
-            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-            ->select(
-                DB::raw('MONTH(thdb.ngayLapHD) as thang'),
-                DB::raw('YEAR(thdb.ngayLapHD) as nam'),
-                DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
-            )
-            ->groupBy('thang', 'nam');
-        $monthlyRevenues = $monthlyQuery->get();
-
-        return response()->json(['monthlyRevenues' => $monthlyRevenues]);
+        $startYear = $request->input('start_year');
+        $endYear = $request->input('end_year');
+        $selectedYear = $request->input('selected_year');
+    
+        $result = [];
+    
+        // Lấy doanh thu cho một năm cụ thể nếu được chỉ định
+        if ($selectedYear) {
+            $monthlyRevenues = $this->getMonthlyRevenues($selectedYear);
+            $result[$selectedYear] = $monthlyRevenues;
+        }
+    
+        // Lấy doanh thu cho nhiều năm liên tiếp
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            if ($year != $selectedYear) {
+                $monthlyRevenues = $this->getMonthlyRevenues($year);
+                $result[$year] = $monthlyRevenues;
+            }
+        }
+    
+        return response()->json(['result' => $result]);
     }
-    public function Quarter(Request $request){
+    
+    protected function getMonthlyRevenues($year)
+    {
+        return DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+            ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+            ->whereYear('thdb.ngayLapHD', $year)
+            ->groupBy(DB::raw('MONTH(thdb.ngayLapHD)'), DB::raw('YEAR(thdb.ngayLapHD)'))
+            ->selectRaw('MONTH(thdb.ngayLapHD) as thang, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+            ->get();
+    }
+    
+
+
+    public function Quarter(Request $request)
+    {
+        $year = $request->input('nam');
+
         // Thống kê theo quý
         $quarterlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
         ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
@@ -32,10 +57,12 @@ class RevenueController extends Controller
             DB::raw('YEAR(thdb.ngayLapHD) as nam'),
             DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
         )
+        ->whereYear('thdb.ngayLapHD', $year) 
         ->groupBy('quy', 'nam');
         $quarterlyRevenues = $quarterlyQuery->get();
         return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
     }
+    
     public function revenueByBrand()
     {
         $revenueByBrand = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
@@ -51,4 +78,24 @@ class RevenueController extends Controller
     
         return response()->json(['revenueByBrand' => $revenueByBrand]);
     }
+    
+    public function productsByQuantitySoldLastMonth()
+{
+    $productsByQuantitySold = DB::table('tchitiethdb')
+        ->join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+        ->select(
+            'tsanpham.maSanPham',
+            'tsanpham.tenSanPham as productName',
+            'tchitiethdb.SL as quantitySold',
+            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as totalRevenue')
+        )
+        ->whereBetween('thdb.ngayLapHD', [now()->subMonth(), now()]) // Lọc theo thời gian trong 1 tháng gần đây
+        ->groupBy('tsanpham.maSanPham', 'productName', 'quantitySold')
+        ->orderByDesc('quantitySold') // Sắp xếp theo lượng mua giảm dần
+        ->get();
+
+    return response()->json(['productsByQuantitySold' => $productsByQuantitySold]);
+}
+
 }
