@@ -15,24 +15,18 @@ class RevenueController extends Controller
         $selectedYear = $request->input('selected_year');
     
         $result = [];
-    
-        // Lấy doanh thu cho một năm cụ thể nếu được chỉ định
         if ($selectedYear) {
             $monthlyRevenues = $this->getMonthlyRevenues($selectedYear);
             $result[$selectedYear] = $monthlyRevenues;
         }
-    
-        // Lấy doanh thu cho nhiều năm liên tiếp
         for ($year = $startYear; $year <= $endYear; $year++) {
             if ($year != $selectedYear) {
                 $monthlyRevenues = $this->getMonthlyRevenues($year);
                 $result[$year] = $monthlyRevenues;
             }
-        }
-    
+        }   
         return response()->json(['result' => $result]);
-    }
-    
+    }    
     protected function getMonthlyRevenues($year)
     {
         return DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
@@ -42,26 +36,35 @@ class RevenueController extends Controller
             ->selectRaw('MONTH(thdb.ngayLapHD) as thang, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
             ->get();
     }
-    
-
-
-    public function Quarter(Request $request)
+    public function QuarterMultipleYears(Request $request)
     {
-        $year = $request->input('nam');
+        $startYear = $request->input('start_year');
+        $endYear = $request->input('end_year');
+        $selectedYear = $request->input('selected_year');
+    
+        $result = [];
+        if ($selectedYear) {
+            $quarterRevenues = $this->getQuarterRevenues($selectedYear);
+            $result[$selectedYear] = $quarterRevenues;
+        }
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            if ($year != $selectedYear) {
+                $quarterRevenues = $this->getQuarterRevenues($year);
+                $result[$year] = $quarterRevenues;
+            }
+        }   
+        return response()->json(['result' => $result]);
+    }    
 
-        // Thống kê theo quý
-        $quarterlyQuery = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+    public function getQuarterRevenues($year){
+        return DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
         ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
-        ->select(
-            DB::raw('QUARTER(thdb.ngayLapHD) as quy'),
-            DB::raw('YEAR(thdb.ngayLapHD) as nam'),
-            DB::raw('SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
-        )
-        ->whereYear('thdb.ngayLapHD', $year) 
-        ->groupBy('quy', 'nam');
-        $quarterlyRevenues = $quarterlyQuery->get();
-        return response()->json(['quarterlyRevenues'=> $quarterlyRevenues]);
+        ->whereYear('thdb.ngayLapHD', $year)
+        ->groupBy(DB::raw('QUARTER(thdb.ngayLapHD)'), DB::raw('YEAR(thdb.ngayLapHD)'))
+        ->selectRaw('QUARTER(thdb.ngayLapHD) as quy, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+        ->get();
     }
+    
     
     public function revenueByBrand()
     {

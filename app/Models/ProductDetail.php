@@ -10,6 +10,7 @@ class ProductDetail extends Model
 {
     // use HasFactory;
     protected $primaryKey = 'maChiTietSP';
+    public $incrementing = false;
 
     protected $table = 'tchitietsp';
     public $timestamps = false;
@@ -32,7 +33,7 @@ class ProductDetail extends Model
     public function watchShape() : BelongsTo {
         return $this->belongsTo(WatchShape::class, 'maHinhDang', 'maHinhDang');
     }
-    public function imagectsp(): HasMany {
-        return $this->hasMany(ImageSP::class, 'maChiTietSP', 'maChiTietSP');
+    public function imagectsp(): BelongsTo {
+        return $this->belongsTo(ImageSP::class, 'maChiTietSP', 'maChiTietSP');
     }
 }
