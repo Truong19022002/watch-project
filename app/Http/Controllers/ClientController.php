@@ -39,65 +39,6 @@ class ClientController extends Controller
 
         return $this->respondWithToken($token);
     }
-
-
-    //Begin: Quên mật khẩu
-
-    // public function ForgotPasswordByPhone(Request $request){
-
-    //     $SDT = $request->input('SDT');
-
-    //     $people = DB::table('tkhachhang')
-    //     ->where('SDT', $SDT)
-    //     ->first();
-
-    //     if(!$people){
-    //         return response()->json(['message' => 'User not found'], 404);
-    //     }
-        
-    //     $randomString = Str::random(9);
-    //     $people->password = $randomString;
-
-    //     $name = 'Test';
-    //             Mail::send('Layout.email', compact('people'), function($email) use($people){
-    //                 $email->subject('New Password');
-    //                 $email->to($people->email);
-    //             });
-    //     $user = DB::table('tkhachhang')
-    //     ->where('SDT', $SDT)
-    //     ->update(['password' => Hash::make($randomString)]);  
-    //     return response()->json(['message' => 'Email sent successfully']);
-    //     // dd($people->password);
-    // }
-    ////
-    
-    // public function ForgotByEmail(Request $request){
-
-    //     $email = $request->input('email');
-    //     $people = DB::table('tkhachhang')
-    //     ->where('email', $email)
-    //     ->first();
-
-    //     if(!$people){
-    //         return response()->json(['message' => 'User not found'], 404);
-    //     }
-        
-    //     $randomString = Str::random(9);
-    //     $people->password = $randomString;
-
-    //     $name = 'Test';
-    //             Mail::send('Layout.email', compact('people'), function($email) use($people){
-    //                 $email->subject('New Password');
-    //                 $email->to($people->email);
-    //             });
-    //     $user = DB::table('tkhachhang')
-    //     ->where('email', $email)
-    //     ->update(['password' => Hash::make($randomString)]);  
-    //     return response()->json(['message' => 'Email sent successfully']);
-    //     // dd($people->password);
-    // }
-
-    // End : Quên mật khẩu
     public function update(Request $request, $maKhachHang)
     {
     $request->validate([
@@ -125,6 +66,29 @@ class ClientController extends Controller
     $client->diaChi = $request->input('diaChi');
     $client->SDT = $request->input('SDT');
     $client->email = $request->input('email');
+    $client->save();
+    return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
+    }
+    public function updatePassword(Request $request, $maKhachHang)
+    {
+    $request->validate([
+        'password'=>'required',
+    ]);
+
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Unauthenticated.'], 401);
+    }
+    if ($user->maKhachHang != $maKhachHang) {
+        return response()->json(['message' => 'Unauthorized.'], 403);
+    }
+    $client = Client::where('maKhachHang', $maKhachHang)->first();
+    if (!$client) {
+        return response()->json(['message' => 'Client not found'], 404);
+    }
+    $client->password = Hash::make($request->input('password'));
+   
     $client->save();
     return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
     }

@@ -15,6 +15,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\DetailProductController;
+use App\Http\Controllers\ForgotController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\WarehouseImportController;
 use Illuminate\Http\Request;
@@ -67,6 +68,7 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::post('/register', [ClientController::class, 'register']);
     Route::get('/profile', [ClientController::class, 'me']);
     Route::post('/logout', [ClientController::class, 'logout']);
+    Route::put('/updatePassword/{maKhachHang}', [ClientController::class, 'updatePassword']);
     Route::put('/update/{maKhachHang}', [ClientController::class,'update']);
 
 });
@@ -94,5 +96,5 @@ Route::get('/showUser', [UserController::class,'showUser']);
 Route::get('/showHdb', [BillSaleController::class, 'showHdb']);
 Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
 
-// Route::post('/forgotByemail', [ClientController::class,'ForgotByEmail']);
-// Route::post('/forgotByphone', [ClientController::class,'ForgotPasswordByPhone']);
+Route::post('/ForgotByEmail', [ForgotController::class,'ForgotByEmail']);
+
