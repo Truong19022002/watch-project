@@ -69,6 +69,7 @@ class CheckoutController extends Controller
         $jsonResult = json_decode($result, true);
         // dd($jsonResult);
 
-        return redirect()->to($jsonResult['payUrl']);
+        // return redirect()->to($jsonResult['payUrl']);
+        return $jsonResult;
     }
 }
