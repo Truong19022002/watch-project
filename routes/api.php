@@ -48,6 +48,7 @@ Route::get('/type', [TypeController::class, 'get']);
 Route::apiResource('cart', CartController::class);
 
 Route::get('/vnpay_payment', [CheckoutController::class, 'vnpay_payment']);
+Route::get('/bill', [CheckoutController::class, 'updateBill']);
 
 Route::middleware(['user'])->prefix('/auth/admin')->group(function() {
     Route::post('/login', [AuthController::class, 'login']);
