@@ -47,7 +47,7 @@ Route::get('/type', [TypeController::class, 'get']);
 
 Route::apiResource('cart', CartController::class);
 
-Route::get('/momo_payment', [CheckoutController::class, 'momo_payment']);
+Route::get('/vnpay_payment', [CheckoutController::class, 'vnpay_payment']);
 
 Route::middleware(['user'])->prefix('/auth/admin')->group(function() {
     Route::post('/login', [AuthController::class, 'login']);
