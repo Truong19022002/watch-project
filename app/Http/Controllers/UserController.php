@@ -17,6 +17,15 @@ class UserController extends Controller
     {
         //
     }
+    public function showUser(Request $request)
+    {
+        $result = DB::table('ttaikhoan')->get();
+
+        return response()->json($result, 200);
+        
+    
+    }
+
 
     /**
      * Show the form for creating a new resource.
