@@ -11,7 +11,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    //
     public function __construct()
     {
         $this->middleware('auth:user', ['except' => ['login', 'register', 'me']]);//login, register methods won't go through the api guard
@@ -35,8 +34,45 @@ class AuthController extends Controller
 
         return $this->respondWithToken($token);
     }
+    public function update(Request $request, $idUser)
+    {
+    $request->validate([
+        'username' => 'required',
+        'firstName' => 'required',
+        'lastName' => 'required',
+        'contact' => 'required',
+        'password' => 'required',
+        'email' => 'required',
 
+    ]);
 
+    try {
+        $admin = JWTAuth::parseToken()->authenticate();
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Unauthenticated.'], 401);
+    }
+
+    
+    if ($admin->idUser != $idUser) {
+        return response()->json(['message' => 'Unauthorized.'], 403);
+    }
+
+    $User = User::where('idUser', $idUser)->first();
+    if (!$User) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $User->username = $request->input('username');
+    $User->firstName = $request->input('firstName');
+    $User->lastName = $request->input('lastName');
+    $User->contact = $request->input('contact');
+    $User->email = $request->input('email');
+    $User->password = $request->input('password');
+
+    $User->save();
+
+    return response()->json(['message' => 'Client updated successfully', 'data' => $User]);
+    }
     public function register(Request $request)
     {
         // Check if the email already exists

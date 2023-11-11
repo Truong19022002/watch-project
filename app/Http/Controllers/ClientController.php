@@ -40,7 +40,6 @@ class ClientController extends Controller
     {
     $request->validate([
         'tenKhachHang' => 'required',
-        'username' => 'required',
         'gioiTinh' => 'required',
         'diaChi' => 'required',
         'SDT' => 'required',
@@ -64,7 +63,6 @@ class ClientController extends Controller
     }
 
     $client->tenKhachHang = $request->input('tenKhachHang');
-    $client->username = $request->input('username');
     $client->gioiTinh = $request->input('gioiTinh');
     $client->diaChi = $request->input('diaChi');
     $client->SDT = $request->input('SDT');
@@ -80,6 +78,7 @@ class ClientController extends Controller
         if ($existingUser) {
             return response()->json([
                 'message' => 'Email already exists',
+                'error' => 'duplicateEmail',
             ], 400);
         }
         $client = new Client;
