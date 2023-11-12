@@ -27,4 +27,7 @@ class Product extends Model
     public function brand () : BelongsTo {
         return $this->belongsTo(Brand::class, 'maThuongHieu', 'maThuongHieu');
     }
+    public function wishlist () : hasMany {
+        return $this->hasMany(WishlistDetail::class, 'maSanPham', 'maSanPham');
+    }
 }

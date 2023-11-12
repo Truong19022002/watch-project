@@ -18,6 +18,8 @@ use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\ForgotController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\WarehouseImportController;
+use App\Http\Controllers\WishListController;
+use App\Http\Controllers\WishlistDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -97,4 +99,5 @@ Route::get('/showHdb', [BillSaleController::class, 'showHdb']);
 Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
 
 Route::post('/ForgotByEmail', [ForgotController::class,'ForgotByEmail']);
+Route::post('/wishlist/add', [WishListController::class,'Wishlist']);
 
