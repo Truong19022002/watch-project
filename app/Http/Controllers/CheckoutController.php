@@ -106,6 +106,8 @@ class CheckoutController extends Controller
                 'SL' => $cartDetail->soLuongSP,
                 'thanhTien' => $product->giaSanPham
             ]);
+
+            $cartDetail->delete();
         }
         return $bill;
     }

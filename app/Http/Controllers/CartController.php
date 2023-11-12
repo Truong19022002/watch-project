@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Cart;
@@ -99,16 +100,18 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $cartDetail = DB::table('tchitietgh')->where('maSanPham', $id)->first();
+        $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
+        try {
+            $cartDetail = $cart->cartDetail()->where('maSanPham', $id)->first();
+            
             if (!$cartDetail) {
                 return response()->json(['message' => 'Cart detail not found'], 404);
             }
-
-            $totalPriceBeforeDeletion = $this->calculateTotalPrice($cartDetails);
-
-            DB::table('tchitietgh')->where('maSanPham', $id)->delete();
+            
+            $totalPriceBeforeDeletion = $this->calculateTotalPrice([$cartDetail]);
+            
+            $cartDetail->delete();
 
             $cart->tongTienGH -= $totalPriceBeforeDeletion;
             $cart->save();
