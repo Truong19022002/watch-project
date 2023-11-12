@@ -18,6 +18,8 @@ use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\ForgotController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\WarehouseImportController;
+use App\Http\Controllers\WishListController;
+use App\Http\Controllers\WishlistDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -59,7 +61,7 @@ Route::middleware(['user'])->prefix('/auth/admin')->group(function() {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/profile', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::put('/update/{idUser}', [AuthController::class,'update']);
+    Route::post('/update/{idUser}', [AuthController::class,'update']);
 
 });
 
@@ -68,8 +70,8 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::post('/register', [ClientController::class, 'register']);
     Route::get('/profile', [ClientController::class, 'me']);
     Route::post('/logout', [ClientController::class, 'logout']);
-    Route::put('/updatePassword/{maKhachHang}', [ClientController::class, 'updatePassword']);
-    Route::put('/update/{maKhachHang}', [ClientController::class,'update']);
+    Route::post('/updatePassword/{maKhachHang}', [ClientController::class, 'updatePassword']);
+    Route::post('/update/{maKhachHang}', [ClientController::class,'update']);
 
 });
 // Route::get('search/{key}',[ProductController::class,'search']);
@@ -97,4 +99,7 @@ Route::get('/showHdb', [BillSaleController::class, 'showHdb']);
 Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
 
 Route::post('/ForgotByEmail', [ForgotController::class,'ForgotByEmail']);
+Route::post('/wishlist/add', [WishListController::class,'Wishlist']);
+Route::delete('/wishlist/remove/{productId}', [WishListController::class,'removeFromWishlist']);
+Route::get('/wishlist', [WishListController::class,'getWishlist']);
 
