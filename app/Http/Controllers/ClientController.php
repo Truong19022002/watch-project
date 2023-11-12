@@ -40,13 +40,15 @@ class ClientController extends Controller
         return $this->respondWithToken($token);
     }
     public function update(Request $request, $maKhachHang)
-    {
+{
     $request->validate([
         'tenKhachHang' => 'required',
         'gioiTinh' => 'required',
         'diaChi' => 'required',
         'SDT' => 'required',
         'email' => 'required',
+        'matKhauCu' => 'required', // Thêm mật khẩu cũ
+        'matKhauMoi' => 'required|min:6', // Thêm mật khẩu mới
     ]);
 
     try {
@@ -61,14 +63,24 @@ class ClientController extends Controller
     if (!$client) {
         return response()->json(['message' => 'Client not found'], 404);
     }
+
+    // Kiểm tra mật khẩu cũ
+    if (!Hash::check($request->input('matKhauCu'), $client->password)) {
+        return response()->json(['message' => 'Incorrect old password'], 400);
+    }
+
+    // Update thông tin và mật khẩu mới
     $client->tenKhachHang = $request->input('tenKhachHang');
     $client->gioiTinh = $request->input('gioiTinh');
     $client->diaChi = $request->input('diaChi');
     $client->SDT = $request->input('SDT');
     $client->email = $request->input('email');
+    $client->password =bcrypt($request->input('matKhauMoi')); // Lưu mật khẩu mới đã được hash
     $client->save();
+
     return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
-    }
+}
+
     public function updatePassword(Request $request, $maKhachHang)
     {
     $request->validate([
