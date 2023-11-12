@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Cart;
@@ -64,7 +65,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cart->tongTienGH = $this->calculateTotalPrice($cart);
+        $cart->tongTienGH = $this->calculateTotalPrice($cart->cartDetail);
         $cart->save();
 
         return response()->json(['message' => 'Product added to cart', 'cart_detail' => $cartDetail]);
@@ -99,14 +100,21 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $cartDetail = DB::table('tchitietgh')->where('maSanPham', $id)->first();
+        $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
+        try {
+            $cartDetail = $cart->cartDetail()->where('maSanPham', $id)->first();
+            
             if (!$cartDetail) {
                 return response()->json(['message' => 'Cart detail not found'], 404);
             }
+            
+            $totalPriceBeforeDeletion = $this->calculateTotalPrice([$cartDetail]);
+            
+            $cartDetail->delete();
 
-            DB::table('tchitietgh')->where('maSanPham', $id)->delete();
+            $cart->tongTienGH -= $totalPriceBeforeDeletion;
+            $cart->save();
 
             return response()->json(['message' => 'Cart detail deleted'], 200);
         } catch (\Exception $e) {
@@ -114,9 +122,8 @@ class CartController extends Controller
         }
     }
 
-    public static function calculateTotalPrice($cart)
+    public static function calculateTotalPrice($cartDetails)
     {
-        $cartDetails = $cart->cartDetail;
         $totalPrice = 0;
         foreach ($cartDetails as $cartDetail) {
             $product = $cartDetail->product;
