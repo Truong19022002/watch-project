@@ -36,6 +36,28 @@ class WishListController extends Controller
 
     return response()->json(['message' => 'Product added to wishlist', 'wishlist_detail' => $wishlistDetail]);
 }
+public function removeFromWishlist($productId)
+{
+    $wishlistDetail = WishlistDetail::where('maKhachHang', auth('client')->user()->maKhachHang)
+        ->where('maSanPham', $productId)
+        ->first();
+
+    if (!$wishlistDetail) {
+        return response()->json(['message' => 'Product not found in wishlist'], 404);
+    }
+
+    $wishlistDetail->delete();
+
+    return response()->json(['message' => 'Product removed from wishlist']);
+}
+public function getWishlist()
+{
+    $wishlist = WishlistDetail::where('maKhachHang', auth('client')->user()->maKhachHang)->get();
+
+    return response()->json(['wishlist' => $wishlist]);
+}
+
+
 
 
     

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class WishlistDetail extends Model
 {
     protected $table = 'wishlist';
+    protected $primaryKey = 'id_wishlist';
     public $timestamps = false;
     public $incrementing = false;
 
