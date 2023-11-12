@@ -46,36 +46,29 @@ class DetailProductController extends Controller
         
     // }
     public function getImageDetail($maSanPham)
-{
-    $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
-
-    if (!$productDetail) {
-        return response()->json(['error' => 'Chi tiết sản phẩm không tồn tại'], 404);
-    }
-
-    $images = $productDetail->imagectsp;
-
-    if (!$images) {
-        return response()->json(['error' => 'Không có ảnh chi tiết sản phẩm'], 404);
-    }
-
-    $imageNames = [];
-
-    foreach ($images as $image) {
-        if (isset($image->imageCTSP)) {
-            $imageNames[] = $image->imageCTSP;
+    {
+        // Tìm chi tiết sản phẩm trong bảng ProductDetail
+        $productDetail = ProductDetail::where('maSanPham', $maSanPham)->first();
+    
+        if (!$productDetail) {
+            return response()->json(['error' => 'Chi tiết sản phẩm không tồn tại'], 404);
+        }  
+        $maChiTietSP = $productDetail->maChiTietSP;
+        $images = ImageSP::where('maChiTietSP', $maChiTietSP)->get();
+        if ($images->isEmpty()) {
+            return response()->json(['error' => 'Không có ảnh chi tiết sản phẩm'], 404);
         }
+        $imageNames = $images->pluck('imageCTSP')->all();
+    
+        // Kiểm tra xem có ảnh nào không
+        if (count($imageNames) === 0) {
+            return response()->json(['error' => 'Không có ảnh chi tiết sản phẩm'], 404);
+        }
+    
+        // Trả về danh sách tên tệp ảnh
+        return response()->json(['imageNames' => $imageNames]);
     }
-
-    // Kiểm tra xem có ảnh nào không
-    if (count($imageNames) === 0) {
-        return response()->json(['error' => 'Không có ảnh chi tiết sản phẩm'], 404);
-    }
-
-    // Trả về danh sách tên tệp ảnh
-    return response()->json(['imageNames' => $imageNames]);
-}
-
+    
     public function getImageByName($imageCTSP)
     {
         $anh = ImageSP::where('imageCTSP', $imageCTSP)->firstOrFail();

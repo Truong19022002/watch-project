@@ -100,5 +100,43 @@ class RevenueController extends Controller
 
     return response()->json(['productsByQuantitySold' => $productsByQuantitySold]);
 }
+protected function getRevenues($year, $month)
+{
+    $result = DetailBillSale::join('tsanpham', 'tchitiethdb.maSanPham', '=', 'tsanpham.maSanPham')
+        ->join('thdb', 'thdb.maHDB', '=', 'tchitiethdb.maHDB')
+        ->whereYear('thdb.ngayLapHD', $year)
+        ->whereMonth('thdb.ngayLapHD', $month)
+        ->groupBy(DB::raw('MONTH(thdb.ngayLapHD)'), DB::raw('YEAR(thdb.ngayLapHD)'))
+        ->selectRaw('MONTH(thdb.ngayLapHD) as thang, YEAR(thdb.ngayLapHD) as nam, SUM(tsanpham.giaSanPham * tchitiethdb.SL) as doanhthu')
+        ->get();
+
+    return $result->isEmpty() ? null : $result;
+}
+
+public function CompareMonths(Request $request)
+{
+    $firstYear = $request->input('first_year');
+    $secondYear = $request->input('second_year');
+    $selectedMonths = $request->input('selected_months');
+    $result = [];
+    foreach ($selectedMonths as $month) {
+        $firstYearRevenues = $this->getRevenues($firstYear, $month);
+        if (is_array($firstYearRevenues) || is_object($firstYearRevenues)) {
+            $result[$firstYear][$month] = $firstYearRevenues;
+        } else {
+            $result[$firstYear][$month] = 'Không có dữ liệu hợp lệ';
+        }
+
+        $secondYearRevenues = $this->getRevenues($secondYear, $month);
+        if (is_array($secondYearRevenues) || is_object($secondYearRevenues)) {
+            $result[$secondYear][$month] = $secondYearRevenues;
+        } else {
+            $result[$secondYear][$month] = 'Không có dữ liệu hợp lệ';
+        }
+    }
+    
+    return response()->json(['result' => $result]);
+}
+
 
 }

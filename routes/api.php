@@ -83,6 +83,8 @@ Route::post('/media-file',[ProductController::class,'uploadImages']);
 Route::get('/monthlyRevenues', [RevenueController::class,'MultipleYears']);
 Route::get('/quarterlyRevenues', [RevenueController::class,'QuarterMultipleYears']);
 Route::get('/revenueByBrand', [RevenueController::class,'revenueByBrand']);
+Route::get('/CompareMonths', [RevenueController::class,'CompareMonths']);
+
 Route::get('revenue', [RevenueController::class,'revenue']);
 Route::get('/productsByQuantitySoldLastMonth', [RevenueController::class,'productsByQuantitySoldLastMonth']);
 
@@ -90,7 +92,7 @@ Route::get('products/{maSanPham}/image', [ProductController::class,'getImage']);
 
 Route::get('image_detail/{imageCTSP}', [DetailProductController::class, 'getImageByName']);
 
-Route::get('products_detail/{maChiTietSP}/image', [DetailProductController::class,'getImageDetail']);
+Route::get('/getImageDetail/{maSanPham}', [DetailProductController::class,'getImageDetail']);
 
 Route::post('update/{maSanPham}', [ProductController::class, 'update']);
 
