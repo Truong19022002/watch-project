@@ -285,8 +285,6 @@ class ProductController extends Controller
     public function getImage($maSanPham)
     {
         $product = Product::where('maSanPham', $maSanPham)->firstOrFail();
-
-        
         return response()->file(public_path("img_product/{$product->anhSP}"));
         
     }
