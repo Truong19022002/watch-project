@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartDetail;
@@ -16,7 +17,7 @@ class CheckoutController extends Controller
         $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/api/bill";
+        $vnp_Returnurl = "http://localhost:4200/bill";
         $vnp_TmnCode = "FLQYP5IJ";//Mã website tại VNPAY 
         $vnp_HashSecret = "JBOUUFLRZBNYQBEQHKFOHSCDRSVTNVRM"; //Chuỗi bí mật
 
@@ -104,13 +105,13 @@ class CheckoutController extends Controller
                 'maHDB' => $bill->maHDB,
                 'maSanPham' => $cartDetail->maSanPham,
                 'SL' => $cartDetail->soLuongSP,
-                'thanhTien' => $product->giaSanPham
+                'thanhTien' => ($product->giaSanPham * $cartDetail->soLuongSP)
             ]);
 
             $cartDetail->delete();
         }
 
-        $result = DB::table('view_hdb_sanpham');
+        $result = DB::table('view_hdb_sanpham')->where('maHDB', $bill->maHDB)->get();
         return $result;
     }
 }
