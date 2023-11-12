@@ -64,7 +64,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cart->tongTienGH = $this->calculateTotalPrice($cart);
+        $cart->tongTienGH = $this->calculateTotalPrice($cart->cartDetail);
         $cart->save();
 
         return response()->json(['message' => 'Product added to cart', 'cart_detail' => $cartDetail]);
@@ -106,7 +106,12 @@ class CartController extends Controller
                 return response()->json(['message' => 'Cart detail not found'], 404);
             }
 
+            $totalPriceBeforeDeletion = $this->calculateTotalPrice($cartDetails);
+
             DB::table('tchitietgh')->where('maSanPham', $id)->delete();
+
+            $cart->tongTienGH -= $totalPriceBeforeDeletion;
+            $cart->save();
 
             return response()->json(['message' => 'Cart detail deleted'], 200);
         } catch (\Exception $e) {
@@ -114,9 +119,8 @@ class CartController extends Controller
         }
     }
 
-    public static function calculateTotalPrice($cart)
+    public static function calculateTotalPrice($cartDetails)
     {
-        $cartDetails = $cart->cartDetail;
         $totalPrice = 0;
 
         foreach ($cartDetails as $cartDetail) {

@@ -93,7 +93,7 @@ class CheckoutController extends Controller
             'ngayLapHD' => $data['vnp_PayDate'],
             'giamGia' => null,
             'PTTT' => $data['vnp_CardType'],
-            'tongTienHDB' => $data['vnp_Amount']
+            'tongTienHDB' => $data['vnp_Amount']/100
         ]);
 
         foreach ($cartDetails as $cartDetail) {
@@ -103,7 +103,7 @@ class CheckoutController extends Controller
                 'maChiTietHDB' => rand(10000000, 99999999),
                 'maHDB' => $bill->maHDB,
                 'maSanPham' => $cartDetail->maSanPham,
-                'SL' => $product->soLuongSP,
+                'SL' => $cartDetail->soLuongSP,
                 'thanhTien' => $product->giaSanPham
             ]);
         }
