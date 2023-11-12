@@ -11,9 +11,8 @@ class BillSaleController extends Controller
 {
     public function showHdb(Request $request)
     {
-        $userId = auth('client')->user()->maKhachHang;
-
-        if($userId) {
+        if (auth('client')->check()) {
+            $userId = auth('client')->user()->maKhachHang;
             $result = BillSale::with('chiTietHoaDon')->where('maKhachHang', $userId)->get();
             return $result;
         }

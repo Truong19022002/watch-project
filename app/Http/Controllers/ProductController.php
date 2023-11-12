@@ -229,7 +229,7 @@ class ProductController extends Controller
     return response()->json($items);
     }
     public function Filter(Request $request){
-        $pageSize = $request->get('pageSize', 10);
+        $pageSize = $request->get('pageSize', 12);
         $minPrice = $request->get('minPrice');
         $maxPrice = $request->get('maxPrice');
         $orderBy = $request->get('orderBy','asc'&'desc');
