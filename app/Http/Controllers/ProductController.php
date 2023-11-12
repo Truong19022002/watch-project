@@ -232,7 +232,7 @@ class ProductController extends Controller
         $pageSize = $request->get('pageSize', 10);
         $minPrice = $request->get('minPrice');
         $maxPrice = $request->get('maxPrice');
-        $orderBy = $request->get('orderBy');
+        $orderBy = $request->get('orderBy','asc'&'desc');
         $gioiTinh = $request->get('gioiTinh');
         $chatLieu = $request->get('chatLieu');
         $hinhDang = $request->get('hinhDang');
