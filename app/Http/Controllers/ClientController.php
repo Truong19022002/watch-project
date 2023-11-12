@@ -45,8 +45,6 @@ class ClientController extends Controller
         'gioiTinh' => 'required',
         'diaChi' => 'required',
         'SDT' => 'required',
-        'matKhauCu' => 'required', // Thêm mật khẩu cũ
-        'matKhauMoi' => 'required|min:6', // Thêm mật khẩu mới
     ]);
 
     try {
@@ -61,18 +59,40 @@ class ClientController extends Controller
     if (!$client) {
         return response()->json(['message' => 'Client not found'], 404);
     }
-
-    // Kiểm tra mật khẩu cũ
-    if (!Hash::check($request->input('matKhauCu'), $client->password)) {
-        return response()->json(['message' => 'Incorrect old password'], 400);
-    }
+    $client-> SDT = $request->input('SDT');
     $client->gioiTinh = $request->input('gioiTinh');
     $client->diaChi = $request->input('diaChi');
-    $client->password =bcrypt($request->input('matKhauMoi'));
     $client->save();
     return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
 }
 
+    public function editPassword(Request $request, $maKhachHang)
+    {
+    $request->validate([
+        'matKhauCu' => 'required', 
+        'matKhauMoi' => 'required|min:6', 
+    ]);
+
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Unauthenticated.'], 401);
+    }
+    if ($user->maKhachHang != $maKhachHang) {
+        return response()->json(['message' => 'Unauthorized.'], 403);
+    }
+    $client = Client::where('maKhachHang', $maKhachHang)->first();
+    if (!$client) {
+        return response()->json(['message' => 'Client not found'], 404);
+    }
+    if (!Hash::check($request->input('matKhauCu'), $client->password)) {
+        return response()->json(['message' => 'Incorrect old password'], 400);
+    }
+    $client->password =bcrypt($request->input('matKhauMoi'));
+
+    $client->save();
+    return response()->json(['message' => 'Client updated successfully', 'data' => $client]);
+    }
     public function updatePassword(Request $request, $maKhachHang)
     {
     $request->validate([

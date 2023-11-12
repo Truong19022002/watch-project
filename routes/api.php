@@ -72,7 +72,7 @@ Route::middleware(['client'])->prefix('/auth/user')->group(function() {
     Route::post('/logout', [ClientController::class, 'logout']);
     Route::post('/updatePassword/{maKhachHang}', [ClientController::class, 'updatePassword']);
     Route::post('/update/{maKhachHang}', [ClientController::class,'update']);
-
+    Route::post('/changePassword/{maKhachHang}', [ClientController::class,'editPassword']);
 });
 // Route::get('search/{key}',[ProductController::class,'search']);
 Route::get('search',[ProductController::class, 'search']);
