@@ -118,29 +118,19 @@ public function CompareMonths(Request $request)
     $firstYear = $request->input('first_year');
     $secondYear = $request->input('second_year');
     $selectedMonths = $request->input('selected_months');
-    
     $result = [];
-    
     foreach ($selectedMonths as $month) {
         $firstYearRevenues = $this->getRevenues($firstYear, $month);
-
-        // Kiểm tra loại dữ liệu trước khi sử dụng foreach
         if (is_array($firstYearRevenues) || is_object($firstYearRevenues)) {
             $result[$firstYear][$month] = $firstYearRevenues;
         } else {
-            // Xử lý trường hợp khi biến không phải là mảng hoặc đối tượng
-            // (có thể in ra thông báo hoặc thực hiện một xử lý khác tùy thuộc vào yêu cầu của bạn)
             $result[$firstYear][$month] = 'Không có dữ liệu hợp lệ';
         }
 
         $secondYearRevenues = $this->getRevenues($secondYear, $month);
-
-        // Kiểm tra loại dữ liệu trước khi sử dụng foreach
         if (is_array($secondYearRevenues) || is_object($secondYearRevenues)) {
             $result[$secondYear][$month] = $secondYearRevenues;
         } else {
-            // Xử lý trường hợp khi biến không phải là mảng hoặc đối tượng
-            // (có thể in ra thông báo hoặc thực hiện một xử lý khác tùy thuộc vào yêu cầu của bạn)
             $result[$secondYear][$month] = 'Không có dữ liệu hợp lệ';
         }
     }
