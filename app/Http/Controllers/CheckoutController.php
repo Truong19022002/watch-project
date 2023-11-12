@@ -110,7 +110,7 @@ class CheckoutController extends Controller
             $cartDetail->delete();
         }
 
-        $result = DB::table('view_hdb_sanpham')->where('maKhachHang', $userId)->get();
+        $result = DB::table('view_hdb_sanpham')->where('maHDB', $bill->maHDB)->get();
         return $result;
     }
 }
