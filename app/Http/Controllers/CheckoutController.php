@@ -88,7 +88,7 @@ class CheckoutController extends Controller
         $data = $request->query();
 
         $bill = BillSale::create([
-            'maHDB' => $data['vnp_BankTranNo'],
+            'maHDB' => rand(10000000, 99999999),
             'maKhachHang' => $userId,
             'ngayLapHD' => $data['vnp_PayDate'],
             'giamGia' => null,
@@ -109,6 +109,8 @@ class CheckoutController extends Controller
 
             $cartDetail->delete();
         }
-        return $bill;
+
+        $result = DB::table('view_hdb_sanpham');
+        return $result;
     }
 }
