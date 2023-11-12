@@ -14,6 +14,6 @@ class BillSale extends Model
     ];
     public function chiTietHoaDon()
     {
-        return $this->hasMany(ChiTietHoaDon::class, 'maHDB', 'maHDB');
+        return $this->hasMany(DetailBillSale::class, 'maHDB', 'maHDB');
     }
 }

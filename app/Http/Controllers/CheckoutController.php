@@ -104,13 +104,13 @@ class CheckoutController extends Controller
                 'maHDB' => $bill->maHDB,
                 'maSanPham' => $cartDetail->maSanPham,
                 'SL' => $cartDetail->soLuongSP,
-                'thanhTien' => $product->giaSanPham
+                'thanhTien' => ($product->giaSanPham * $cartDetail->soLuongSP)
             ]);
 
             $cartDetail->delete();
         }
 
-        $result = DB::table('view_hdb_sanpham');
+        $result = DB::table('view_hdb_sanpham')->where('maKhachHang', $userId)->get();
         return $result;
     }
 }
