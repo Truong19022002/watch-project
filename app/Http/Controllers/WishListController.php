@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class WishListController extends Controller
 {
-    public function Wishlist(Request $request)
+    public function Wishlist(Request $request ,$maSanPham)
 {
-    $productId = $request->input('maSanPham');
-
+    $productId = $maSanPham;
     $product = DB::table('view_product')->where('maSanPham', $productId)->first();
 
     if (!$product) {
@@ -34,8 +33,7 @@ class WishListController extends Controller
         $wishlistDetail->save();
     }
 
-    return response()->json(['message' => 'Product added to wishlist', 'wishlist_detail' => $wishlistDetail]);
-}
+    return response()->json(['message' => 'Product added to wishlist', 'wishlist_detail' => $wishlistDetail]);}
 public function removeFromWishlist($productId)
 {
     $wishlistDetail = WishlistDetail::where('maKhachHang', auth('client')->user()->maKhachHang)

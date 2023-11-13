@@ -101,7 +101,7 @@ Route::get('/showHdb', [BillSaleController::class, 'showHdb']);
 Route::get('/showPN', [WarehouseImportController::class,'showWarehouseImport']);
 
 Route::post('/ForgotByEmail', [ForgotController::class,'ForgotByEmail']);
-Route::post('/wishlist/add', [WishListController::class,'Wishlist']);
+Route::post('/wishlist/add/{maSanPham}', [WishListController::class,'Wishlist']);
 Route::delete('/wishlist/remove/{productId}', [WishListController::class,'removeFromWishlist']);
 Route::get('/wishlist', [WishListController::class,'getWishlist']);
 

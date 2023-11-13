@@ -13,7 +13,7 @@ class BillSaleController extends Controller
     {
         if (auth('client')->check()) {
             $userId = auth('client')->user()->maKhachHang;
-            $result = BillSale::with('chiTietHoaDon')->where('maKhachHang', $userId)->get();
+            $result = BillSale::with(['chiTietHoaDon.sanPham.productDetail'])->where('maKhachHang', $userId)->get();
             return $result;
         }
 

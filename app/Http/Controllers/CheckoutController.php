@@ -8,7 +8,7 @@ use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\BillSale;
 use App\Models\DetailBillSale;
-
+use Mail;
 class CheckoutController extends Controller
 {
     public function vnpay_payment(Request $request) {
@@ -85,6 +85,10 @@ class CheckoutController extends Controller
         $cart = Cart::where('maKhachHang', auth('client')->user()->maKhachHang)->first();
         $cartCode = $cart->maGioHang;
         $cartDetails = CartDetail::where('maGioHang', $cartCode)->get();
+        //get information user
+        $user = DB::table('tkhachhang')->where('maKhachHang', $userId)->first();
+        //get email
+        $email = $user->email;
 
         $data = $request->query();
 
@@ -97,11 +101,15 @@ class CheckoutController extends Controller
             'tongTienHDB' => $data['vnp_Amount']/100
         ]);
 
-        foreach ($cartDetails as $cartDetail) {
-            $product = $cartDetail->product;
+        if ($cartDetails->isEmpty()) {
+            return $bill;
+        } else {
 
-            DetailBillSale::create([
-                'maChiTietHDB' => rand(10000000, 99999999),
+            foreach ($cartDetails as $cartDetail) {
+                $product = $cartDetail->product;
+                
+                DetailBillSale::create([
+                    'maChiTietHDB' => rand(10000000, 99999999),
                 'maHDB' => $bill->maHDB,
                 'maSanPham' => $cartDetail->maSanPham,
                 'SL' => $cartDetail->soLuongSP,
@@ -109,9 +117,17 @@ class CheckoutController extends Controller
             ]);
 
             $cartDetail->delete();
+            }
         }
 
         $result = DB::table('view_hdb_sanpham')->where('maHDB', $bill->maHDB)->get();
+
+        //send mail
+        Mail::send('Layout.SendBill', compact('user', 'result', 'bill'), function($message) use ($user){
+            $message->subject('Bill');
+            $message->to($user->email);
+        });
+
         return $result;
     }
 }
